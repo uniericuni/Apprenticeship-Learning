@@ -18,6 +18,7 @@ class game:
         # object queue initialization
         self.objects = []
         self.objects.append(car('car.png'))
+        self.bg = pygame.image.load( IMAGE_PATH + 'bg.png')
 
         # event message
         self.events = []
@@ -60,6 +61,7 @@ class game:
 
         # figures filled
         self.screen.fill(BLACK)
+        self.screen.blit(self.bg, self.bg.get_rect())
         for obj in self.objects:
             rect = obj.surface.get_rect()
             rect.center = tuple(obj.position)

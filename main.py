@@ -4,8 +4,10 @@ import game
 if __name__ == '__main__':
 
     status = 1
-    game = game.game()
+    gamemgr = game.gamemgr()
+
+    # main game loop
     while status:
-        status = game.input()
-        game.update()
-        game.render()
+        status = gamemgr.input()
+        gamemgr.update()
+        gamemgr.render()

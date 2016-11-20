@@ -1,26 +1,25 @@
 import pygame
 import numpy as np
-from config import *
 
-STARTX = 512
-STARTY = 384
-SCALE = 0.1
 SPEED = 0.4
-ACCELERATION = 1.0
-SPEED_MAX = 5
-DRAG = 0.3
+ACCELERATION = 3.0
+DRAG = 1.2
+SPEED_MAX = 24
 
 class car:
     
-    def __init__(self, fname):
-        self.figure = pygame.image.load( IMAGE_PATH + fname )
+    def __init__(self, fname, posx=512, posy=384, spdx=0, spdy=0, accx=0, accy=0, sc=1, rt=0, isdrag=True):
+        self.figure = pygame.image.load(fname)
         self.surface = self.figure
-        self.scale(SCALE)
-        self.position = np.array([STARTX,STARTY])
-        self.speed = np.array([0,0])
+        self.position = np.array([posx,posy])
+        self.scale(sc)
+        self.rotate(rt)
+        self.speed = np.array([spdx,spdy])
+        self.accelerate(np.array([accx,accy]))
+        self.isdrag = isdrag
     
     def update(self):
-        self.drag()
+        if self.isdrag: self.drag()
         self.move()
    
     def move(self):
@@ -32,16 +31,21 @@ class car:
             dragspeed = self.speed - self.speed * (DRAG/spnorm)
             over = dragspeed*self.speed > 0
             self.speed = dragspeed*over
-
-    def accelerate(self, acc):
-        # accelerate
-        self.speed = self.speed + np.array(acc) * ACCELERATION
+    
+    def speedup(self, spd):
+        self.speed = spd
         spnorm = np.linalg.norm(self.speed)
         if spnorm > SPEED_MAX:
             self.speed *= SPEED_MAX/spnorm
+
+    def accelerate(self, acc):
+        # accelerate
+        self.speedup(self.speed + np.array(acc)*ACCELERATION)
 
     def scale(self, sc):
         w = int(self.surface.get_width() * sc)
         h = int(self.surface.get_height() * sc)
         self.surface = pygame.transform.scale(self.surface, (w,h))
 
+    def rotate(self, rt):
+        self.surface = pygame.transform.rotate(self.surface, rt)

@@ -1,7 +1,7 @@
 import pygame
-import car
-import colors
 from pygame.locals import *
+from car import *
+from config import *
 
 # game object
 class game:
@@ -20,31 +20,37 @@ class game:
         self.objects.append(car('car.png'))
 
         # event message
-        self.events = {}
+        self.events = []
 
     def input(self):
 
         # game clock delta
         self.clock.tick(30)
 
-        # event messagge
-        for event in pygame pygame.event.get():
-            down = event.type==KEYDOWN
-            if not hasattr(event, 'key'): continue
-            if event.key == K_UP: self.events['horizontal_acc'] = (0,1)
-            elif event.key == K_DOWN: self.events['horizontal_acc'] = (0,-1)
-            if event.key == K_RIGHT: self.events['vertical_acc'] = (1,0)
-            elif event.key == K_LEFT: self.events['vertical_acc'] = (-1,0)
-            if event.key == K_ESCAPE: return 0
+        # input event message
+        for event in pygame.event.get():
+            if event.type==KEYDOWN:
+                if not hasattr(event, 'key'): continue
+                if event.key == K_ESCAPE: return 0
+                self.events.append(event.key)
+            elif event.type==KEYUP:
+                if not hasattr(event, 'key'): continue
+                if event.key in self.events: self.events.remove(event.key)
+
+        # return status
         return 1
 
     def update(self):
 
         # event handler
+        yacc = 0
+        xacc = 0
         for key in self.events:
-            if key=='horizontal_acc' or key=='vertical_acc':
-                msg = self.events[key]
-                self.objects[0].accelerate(msg)
+            if key==K_DOWN: yacc = 1 
+            elif key==K_UP: yacc = -1
+            if key==K_RIGHT: xacc = 1
+            elif key==K_LEFT: xacc = -1
+        self.objects[0].accelerate([xacc,yacc])
 
         # object status updage
         for obj in self.objects:
@@ -53,11 +59,11 @@ class game:
     def render(self):
 
         # figures filled
-        self.screen.fill(colors.BLACK)
+        self.screen.fill(BLACK)
         for obj in self.objects:
-            rect = obj.get_rect()
-            rect.center = obj.position
-            screen.blit(obj.figure, rect)
+            rect = obj.surface.get_rect()
+            rect.center = tuple(obj.position)
+            self.screen.blit(obj.surface, rect)
 
         # double buffer update
         pygame.display.flip()

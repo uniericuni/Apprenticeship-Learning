@@ -75,14 +75,20 @@ class gamemgr:
 
         # object status update:
         self.background.update()
+        removeid = []
         for i,obj in enumerate(self.objects):
-            if i==0:
-                rect = obj.surface.get_rect()
-                if rect.left <= self.background.minbound[0]: continue
-                if rect.top <= self.background.minbound[1]: continue
-                if rect.right >= self.background.maxbound[0]: continue
-                if rect.bottom >= self.background.maxbound[1]: continue
             obj.update()
+            x,y = obj.position
+            if i==0:
+                if x < self.background.minbound[0]: x = self.background.minbound[0]
+                if y < self.background.minbound[1]: y = self.background.minbound[1]
+                if x > self.background.maxbound[0]: x = self.background.maxbound[0]
+                if y > self.background.maxbound[1]: y = self.background.maxbound[1]
+                obj.position = np.array([x,y])
+            if i!=0 and y > self.background.maxbound[1]+20: removeid.append(i)
+
+        # remove redundant objects:
+        for id in removeid: self.objects.pop(id)
 
     def render(self):
 

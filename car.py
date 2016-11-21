@@ -11,6 +11,7 @@ class car:
     def __init__(self, fname, posx=512, posy=384, spdx=0, spdy=0, accx=0, accy=0, sc=1, rt=0, isdrag=True):
         self.figure = pygame.image.load(fname)
         self.surface = self.figure
+        self.rect = self.surface.get_rect()
         self.position = np.array([posx,posy])
         self.scale(sc)
         self.rotate(rt)
@@ -21,6 +22,8 @@ class car:
     def update(self):
         if self.isdrag: self.drag()
         self.move()
+        self.rect = self.surface.get_rect()
+        self.rect.center = tuple(self.position)
    
     def move(self):
         self.position = self.position + self.speed * SPEED

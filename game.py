@@ -73,36 +73,40 @@ class gamemgr:
         if OPPONENTCARSPAWN in self.events: self.events.remove(OPPONENTCARSPAWN)
         self.objects[0].accelerate([xacc,yacc])
 
-        # object status update:
+        # object status update
         self.background.update()
         removeid = []
+        collisionid = []
+        main = self.objects[0]
         for i,obj in enumerate(self.objects):
             obj.update()
             x,y = obj.position
+            rect = obj.surface.get_rect()
             if i==0:
                 if x < self.background.minbound[0]: x = self.background.minbound[0]
                 if y < self.background.minbound[1]: y = self.background.minbound[1]
                 if x > self.background.maxbound[0]: x = self.background.maxbound[0]
                 if y > self.background.maxbound[1]: y = self.background.maxbound[1]
                 obj.position = np.array([x,y])
-            if i!=0 and y > self.background.maxbound[1]+20: removeid.append(i)
+            if i!=0:
+                if y > self.background.maxbound[1]+20: removeid.append(i)
+                if main.rect.colliderect(obj.rect): collisionid.append(i)
 
-        # remove redundant objects:
+        # remove redundant objects
         for id in removeid: self.objects.pop(id)
+        
+        # collision cars
+        for id in collisionid: print id
 
     def render(self):
 
         # background
         self.screen.fill(BLACK)
-        rect = self.background.surface.get_rect()
-        rect.left,rect.top = tuple(self.background.position)
-        self.screen.blit(self.background.surface, rect)
+        self.screen.blit(self.background.surface, self.background.rect)
 
         # objects
         for i,obj in enumerate(self.objects):
-            rect = obj.surface.get_rect()
-            rect.center = tuple(obj.position)
-            self.screen.blit(obj.surface, rect)
+            self.screen.blit(obj.surface, obj.rect)
 
         # double buffer update
         pygame.display.flip()

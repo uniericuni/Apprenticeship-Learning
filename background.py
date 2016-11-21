@@ -18,6 +18,7 @@ class background:
         self.figure = pygame.image.load(fname)
         self.surface = self.figure
         self.surface = pygame.transform.scale(self.surface, (1024,768*2))
+        self.rect = self.surface.get_rect()
         self.position = np.array([posx,posy])
 
         self.minbound = np.array([BOUND_XMIN, BOUND_YMIN])
@@ -33,6 +34,8 @@ class background:
     def update(self):
         self.position += np.array([0,2])
         if self.position[1] == 0: self.reload()
+        self.rect = self.surface.get_rect()
+        self.rect.left,self.rect.top = tuple(self.position)
 
     def reload(self):
         self.position = np.array([0,-768])

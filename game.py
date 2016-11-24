@@ -28,9 +28,13 @@ class gamemgr:
         main_car = car(fname=IMAGE_PATH+'car.png', sc=0.1)
         self.objects.append(main_car)
         self.background = background(fname=IMAGE_PATH+'bg.png')
+        self.collideds = []
 
         # event message
         self.events = []
+
+        # status init
+        self.status = 1
 
     def input(self):
 
@@ -47,20 +51,25 @@ class gamemgr:
             # input event
             elif event.type==KEYDOWN:
                 if not hasattr(event, 'key'): continue
-                if event.key == K_ESCAPE: return 0
-                self.events.append(event.key)
+                elif event.key == K_ESCAPE: self.status = 0
+                elif event.key==K_SPACE:
+                    if self.status==1: self.status = 2
+                    elif self.status==2: self.status = 1
+                    print "status", self.status
+                else: self.events.append(event.key)
             elif event.type==KEYUP:
                 if not hasattr(event, 'key'): continue
                 if event.key in self.events: self.events.remove(event.key)
 
         # return status
-        return 1
+        return self.status
 
     def update(self):
 
         # update message handling
         yacc = 0
         xacc = 0
+        lane = 0
         for key in self.events:
             if key==OPPONENTCARSPAWN:
                 pos = self.background.spawnpoint[random.randint(0,5)]
@@ -70,13 +79,33 @@ class gamemgr:
             if key==K_UP: yacc = -1
             if key==K_RIGHT: xacc = 1
             if key==K_LEFT: xacc = -1
-        if OPPONENTCARSPAWN in self.events: self.events.remove(OPPONENTCARSPAWN)
-        self.objects[0].accelerate([xacc,yacc])
+            if key==K_1: lane = 1
+            if key==K_2: lane = 2
+            if key==K_3: lane = 3
+            if key==K_4: lane = 4
+            if key==K_5: lane = 5
+            if key==K_6: lane = 6
+            if key==K_7: lane = 7
+            if key==K_8: lane = 8
+            if key==K_9: lane = 9
 
-        # object status update
+        # update opponent spawning
+        if OPPONENTCARSPAWN in self.events: self.events.remove(OPPONENTCARSPAWN)
+
+        # update main character status
+        if self.status==1:
+            self.objects[0].accelerate([xacc,yacc])
+        if self.status==2 and lane!=0:
+            pos = np.array(self.background.spawnpoint[lane-1])
+            pos[1] = self.objects[0].position[1]
+            self.objects[0].settarget(pos)
+
+        # update other objects status
+        while self.collideds:
+            self.collideds[-1].load( IMAGE_PATH+'opponent_car.png' )
+            self.collideds.pop()
         self.background.update()
         removeid = []
-        collisionid = []
         main = self.objects[0]
         for i,obj in enumerate(self.objects):
             obj.update()
@@ -90,13 +119,14 @@ class gamemgr:
                 obj.position = np.array([x,y])
             if i!=0:
                 if y > self.background.maxbound[1]+20: removeid.append(i)
-                if main.rect.colliderect(obj.rect): collisionid.append(i)
+                if main.rect.colliderect(obj.rect): self.collideds.append(obj)
 
         # remove redundant objects
         for id in removeid: self.objects.pop(id)
         
         # collision cars
-        for id in collisionid: print id
+        for collider in self.collideds:
+            collider.load( IMAGE_PATH+'hit_car.png' )
 
     def render(self):
 

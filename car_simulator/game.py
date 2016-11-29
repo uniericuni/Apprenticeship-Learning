@@ -4,6 +4,7 @@ from pygame.locals import *
 from config import *
 from car import *
 from background import *
+from font import *
 
 OPPONENTCARSPAWN = pygame.USEREVENT+1
 
@@ -25,16 +26,26 @@ class gamemgr:
 
         # object queue initialization
         self.objects = []
+        self.collideds = []
         main_car = car(fname=IMAGE_PATH+'car.png', sc=0.1)
         self.objects.append(main_car)
+
+        # background and text interface init
         self.background = background(fname=IMAGE_PATH+'bg.png')
-        self.collideds = []
+        self.status = font(FONT,FONTSIZE, (40,200))
+        self.instruction = font(FONT,FONTSIZE, (40,40))
+        self.instruction.update( "GAME INSTRUCTION"             )
+        self.instruction.update( "-------------------"          ) 
+        self.instruction.update( "SPACE: CHANGE MODE"           )
+        self.instruction.update( "RIGHT: MOVE RIGHT"            )
+        self.instruction.update( "LEFT: MOVE LEFT"              )
+        self.instruction.update( "NUMBER: CHANGE LANE"          )
 
         # event message
         self.events = []
 
-        # status init
-        self.status = 1
+        # state init
+        self.state = 1
 
     def input(self):
 
@@ -51,18 +62,17 @@ class gamemgr:
             # input event
             elif event.type==KEYDOWN:
                 if not hasattr(event, 'key'): continue
-                elif event.key == K_ESCAPE: self.status = 0
+                elif event.key == K_ESCAPE: self.state = 0
                 elif event.key==K_SPACE:
-                    if self.status==1: self.status = 2
-                    elif self.status==2: self.status = 1
-                    print "status", self.status
+                    if self.state==1: self.state = 2
+                    elif self.state==2: self.state = 1
                 else: self.events.append(event.key)
             elif event.type==KEYUP:
                 if not hasattr(event, 'key'): continue
                 if event.key in self.events: self.events.remove(event.key)
 
-        # return status
-        return self.status
+        # return game state
+        return self.state
 
     def update(self):
 
@@ -93,9 +103,9 @@ class gamemgr:
         if OPPONENTCARSPAWN in self.events: self.events.remove(OPPONENTCARSPAWN)
 
         # update main character status
-        if self.status==1:
+        if self.state==1:
             self.objects[0].accelerate([xacc,yacc])
-        if self.status==2 and lane!=0:
+        if self.state==2 and lane!=0:
             pos = np.array(self.background.spawnpoint[lane-1])
             pos[1] = self.objects[0].position[1]
             self.objects[0].settarget(pos)
@@ -104,7 +114,6 @@ class gamemgr:
         while self.collideds:
             self.collideds[-1].load( IMAGE_PATH+'opponent_car.png' )
             self.collideds.pop()
-        self.background.update()
         removeid = []
         main = self.objects[0]
         for i,obj in enumerate(self.objects):
@@ -120,6 +129,14 @@ class gamemgr:
             if i!=0:
                 if y > self.background.maxbound[1]+20: removeid.append(i)
                 if main.rect.colliderect(obj.rect): self.collideds.append(obj)
+
+        # update background and font interface
+        pos = main.position
+        self.status.update( "game state: %d"%self.state )
+        self.status.update( "position: %d,%d"%( pos[0], pos[1] ))
+        self.status.update( "lane: %d"%1 )
+        self.status.update( "hit: %d"%len(self.collideds) )
+        self.background.update()
 
         # remove redundant objects
         for id in removeid: self.objects.pop(id)
@@ -137,6 +154,13 @@ class gamemgr:
         # objects
         for i,obj in enumerate(self.objects):
             self.screen.blit(obj.surface, obj.rect)
+
+        # font interface
+        for text in self.instruction.texts:
+            self.screen.blit(text[0], text[1])
+        for text in self.status.texts:
+            self.screen.blit(text[0], text[1])
+        self.status.clear()
 
         # double buffer update
         pygame.display.flip()

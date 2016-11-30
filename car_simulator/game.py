@@ -7,7 +7,9 @@ from background import *
 from font import *
 
 OPPONENTCARSPAWN = pygame.USEREVENT+1
+RECORDSIGN = pygame.USEREVENT+2
 TIMEDELTA = 30
+RECORDSIGNINTERVAL = 5
 
 # game manager object
 class gamemgr:
@@ -24,6 +26,7 @@ class gamemgr:
         # game clock initialization
         self.clock = pygame.time.Clock()
         pygame.time.set_timer(OPPONENTCARSPAWN, TIMEDELTA*100)
+        pygame.time.set_timer(RECORDSIGN, TIMEDELTA*25)
 
         # object queue initialization
         self.objects = []
@@ -33,7 +36,7 @@ class gamemgr:
 
         # background and text interface init
         self.background = background(fname=IMAGE_PATH+'bg.png', frname=IMAGE_PATH+'road.png')
-        self.status = font(FONT,FONTSIZE, (20,160))
+        self.status = font(FONT,FONTSIZE, (20,200))
         self.instruction = font(FONT,FONTSIZE, (20,40))
         self.instruction.update( "GAME INSTRUCTION"                             )
         self.instruction.update( "--------------------------"                   )
@@ -41,12 +44,15 @@ class gamemgr:
         self.instruction.update( "ARROW KEY: MOVE"                              )
         self.instruction.update( "NUMBER: CHANGE LANE NUMBER"                   )
         self.instruction.update( "A-H: CHANGE LANE"                             )
+        self.instruction.update( "R: RECORD"                                    )
 
         # event message
         self.events = []
 
         # state init
         self.state = 1
+        self.record = False
+        self.recordsign = RECORDSIGNINTERVAL
 
     def input(self):
 
@@ -58,15 +64,18 @@ class gamemgr:
             # timer event 
             if event.type==OPPONENTCARSPAWN:
                 self.events.append(OPPONENTCARSPAWN)
+            if event.type==RECORDSIGN:
+                self.events.append(RECORDSIGN)
 
             # input event
             elif event.type==KEYDOWN:
                 if not hasattr(event, 'key'): continue
-                elif event.key == K_ESCAPE: self.state = 0
+                elif event.key==K_ESCAPE: self.state = 0
                 elif event.key==K_SPACE:
                     if self.state==1: self.state = 2
                     elif self.state==2: self.state = 3
                     elif self.state==3: self.state = 1
+                elif event.key==K_r: self.record = not self.record
                 else: 
                     self.events.append(event.key)
             elif event.type==KEYUP:
@@ -83,12 +92,15 @@ class gamemgr:
         xacc = 0
         lane = 0
         lanenum = 0
+        self.recordsign -= 1
         for key in self.events:
             if key==OPPONENTCARSPAWN:
                 l = random.randint(1,self.background.lanenum-2)
                 pos = self.background.spawnpoint[l]
                 op_car = car(fname=IMAGE_PATH+'opponent_car.png', posx=pos[0], posy=pos[1], spdy=random.uniform(4,12) ,sc=0.1, isdrag=False)
                 self.objects.append(op_car)
+            if key==RECORDSIGN:
+                self.recordsign = RECORDSIGNINTERVAL
             #if key==pygame.K_DOWN: yacc = 1 
             #if key==pygame.K_UP: yacc = -1
             if key==pygame.K_RIGHT: xacc = 1
@@ -106,8 +118,9 @@ class gamemgr:
             if key==pygame.K_h: lane = 6
             if key==pygame.K_j: lane = 7
 
-        # update opponent spawning
+        # update timer
         if OPPONENTCARSPAWN in self.events: self.events.remove(OPPONENTCARSPAWN)
+        if RECORDSIGN in self.events: self.events.remove(RECORDSIGN)
 
         # update main character status: state 1
         if self.state==1:
@@ -177,11 +190,14 @@ class gamemgr:
             collider.load( IMAGE_PATH+'hit_car.png' )
 
         # feature parser
-        f = [0]*(self.background.lanenum+10)
-        f[onLane] = 1
-        f[qdist+10] = 1
+        if self.record:
+            f = [0]*15
+            f[onLane] = 1
+            f[qdist+10] = 1
+            return f
+        else:
+            return None
         
-        return f
 
     def render(self):
 
@@ -201,6 +217,10 @@ class gamemgr:
         for text in self.status.texts:
             self.screen.blit(text[0], text[1])
         self.status.clear()
+
+        # record sign
+        if self.record and self.recordsign>0:
+            pygame.draw.circle(self.screen, RED, (900,40), 10)
 
         # double buffer update
         pygame.display.flip()

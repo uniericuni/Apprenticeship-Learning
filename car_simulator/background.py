@@ -3,7 +3,7 @@ import numpy as np
 
 BACKGROUND_SPEED = 6
 ROADWIDTH = 50
-MID = 512
+MID = 534
 
 BOUND_YMAX = 768
 BOUND_YMIN = 0

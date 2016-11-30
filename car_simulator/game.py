@@ -53,8 +53,7 @@ class gamemgr:
         self.clock.tick(30)
 
         # events handling
-        for event in pygame.event.get():
-            
+        for event in pygame.event.get(): 
             # timer event 
             if event.type==OPPONENTCARSPAWN:
                 self.events.append(OPPONENTCARSPAWN)
@@ -66,7 +65,9 @@ class gamemgr:
                 elif event.key==K_SPACE:
                     if self.state==1: self.state = 2
                     elif self.state==2: self.state = 1
-                else: self.events.append(event.key)
+                else: 
+                    print event.key
+                    self.events.append(event.key)
             elif event.type==KEYUP:
                 if not hasattr(event, 'key'): continue
                 if event.key in self.events: self.events.remove(event.key)
@@ -81,6 +82,8 @@ class gamemgr:
         xacc = 0
         lane = 0
         lanenum = 0
+        print K_a
+        print self.events
         for key in self.events:
             if key==OPPONENTCARSPAWN:
                 l = random.randint(0,self.background.lanenum-1)
@@ -117,6 +120,7 @@ class gamemgr:
 
         # update main background status: state 2
         if lanenum!=0:
+            print lanenum
             self.updatespawnpoint(lanenum)
 
         # update other objects status

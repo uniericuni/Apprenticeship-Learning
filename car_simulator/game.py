@@ -31,7 +31,7 @@ class gamemgr:
         self.objects.append(main_car)
 
         # background and text interface init
-        self.background = background(fname=IMAGE_PATH+'bg.png')
+        self.background = background(fname=IMAGE_PATH+'bg.png', frname=IMAGE_PATH+'road.png')
         self.status = font(FONT,FONTSIZE, (40,200))
         self.instruction = font(FONT,FONTSIZE, (40,40))
         self.instruction.update( "GAME INSTRUCTION"                             )
@@ -80,9 +80,11 @@ class gamemgr:
         yacc = 0
         xacc = 0
         lane = 0
+        lanenum = 0
         for key in self.events:
             if key==OPPONENTCARSPAWN:
-                pos = self.background.spawnpoint[random.randint(0,5)]
+                l = random.randint(0,self.background.lanenum-1)
+                pos = self.background.spawnpoint[l]
                 op_car = car(fname=IMAGE_PATH+'opponent_car.png', posx=pos[0], posy=pos[1], spdy=random.uniform(12,24) ,sc=0.1, rt=180, isdrag=False)
                 self.objects.append(op_car)
             if key==K_DOWN: yacc = 1 
@@ -109,10 +111,13 @@ class gamemgr:
 
         # update main character status: state 2
         if self.state==2 and lane!=0:
-            print lane
             pos = np.array(self.background.spawnpoint[lane-1])
             pos[1] = self.objects[0].position[1]
             self.objects[0].settarget(pos)
+
+        # update main background status: state 2
+        if lanenum!=0:
+            self.updatespawnpoint(lanenum)
 
         # update other objects status
         while self.collideds:
@@ -155,6 +160,8 @@ class gamemgr:
         # background
         self.screen.fill(BLACK)
         self.screen.blit(self.background.surface, self.background.rect)
+        for i,rect in enumerate(self.background.roadrects):
+            self.screen.blit(self.background.roadsurfaces[i], rect)
 
         # objects
         for i,obj in enumerate(self.objects):

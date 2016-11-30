@@ -4,8 +4,8 @@ import numpy as np
 
 SPEED = 0.4                     # speed multiplier
 ACCELERATION = 3.0              # acceleration multiplier
-DRAG = 1.2                      # drag multiplier
-SPEED_MAX = 24                  # max speed
+DRAG = 1.0                      # drag multiplier
+SPEED_MAX = 14                  # max speed
 TARGETBUFF = 1                  # target tolerance, in avoidance of oscillation
 
 class car:
@@ -68,8 +68,8 @@ class car:
 
     def targetmove(self):
         if np.all(np.abs(self.position-self.target)<TARGETBUFF):
-            self.istargetin = False
-            self.speedup(0)
+            self.istargeting = False
+            self.speedup(np.array([0,0]))
         else:
             acc = self.target-self.position
             self.accelerate(acc/np.linalg.norm(acc))

@@ -22,7 +22,7 @@ class gamemgr:
 
         # game clock initialization
         self.clock = pygame.time.Clock()
-        pygame.time.set_timer(OPPONENTCARSPAWN, 30*50)
+        pygame.time.set_timer(OPPONENTCARSPAWN, 30*100)
 
         # object queue initialization
         self.objects = []
@@ -32,14 +32,14 @@ class gamemgr:
 
         # background and text interface init
         self.background = background(fname=IMAGE_PATH+'bg.png', frname=IMAGE_PATH+'road.png')
-        self.status = font(FONT,FONTSIZE, (40,200))
-        self.instruction = font(FONT,FONTSIZE, (40,40))
+        self.status = font(FONT,FONTSIZE, (20,160))
+        self.instruction = font(FONT,FONTSIZE, (20,40))
         self.instruction.update( "GAME INSTRUCTION"                             )
-        self.instruction.update( "-------------------"                          ) 
+        self.instruction.update( "--------------------------"                   )
         self.instruction.update( "SPACE: CHANGE GMAE MODE"                      )
-        self.instruction.update( "ARROW KEY: MOVE (UNDER MODE 1)"               )
-        self.instruction.update( "NUMBER: CHANGE LANE NUMBER (UNDER MODE 2)"    )
-        self.instruction.update( "A-G: CHANGE (UNDER MODE 2)"                   )
+        self.instruction.update( "ARROW KEY: MOVE"                              )
+        self.instruction.update( "NUMBER: CHANGE LANE NUMBER"                   )
+        self.instruction.update( "A-H: CHANGE LANE"                             )
 
         # event message
         self.events = []
@@ -66,7 +66,6 @@ class gamemgr:
                     if self.state==1: self.state = 2
                     elif self.state==2: self.state = 1
                 else: 
-                    print event.key
                     self.events.append(event.key)
             elif event.type==KEYUP:
                 if not hasattr(event, 'key'): continue
@@ -82,28 +81,28 @@ class gamemgr:
         xacc = 0
         lane = 0
         lanenum = 0
-        print K_a
-        print self.events
         for key in self.events:
             if key==OPPONENTCARSPAWN:
-                l = random.randint(0,self.background.lanenum-1)
+                l = random.randint(1,self.background.lanenum-2)
                 pos = self.background.spawnpoint[l]
-                op_car = car(fname=IMAGE_PATH+'opponent_car.png', posx=pos[0], posy=pos[1], spdy=random.uniform(12,24) ,sc=0.1, rt=180, isdrag=False)
+                op_car = car(fname=IMAGE_PATH+'opponent_car.png', posx=pos[0], posy=pos[1], spdy=random.uniform(4,12) ,sc=0.1, isdrag=False)
                 self.objects.append(op_car)
-            if key==K_DOWN: yacc = 1 
-            if key==K_UP: yacc = -1
-            if key==K_RIGHT: xacc = 1
-            if key==K_LEFT: xacc = -1
-            if key==K_1: lanenum = 1
-            if key==K_2: lanenum = 2
-            if key==K_3: lanenum = 3
-            if key==K_4: lanenum = 4
-            if key==K_5: lanenum = 5
-            if key==K_a: lane = 1
-            if key==K_s: lane = 2
-            if key==K_d: lane = 3
-            if key==K_f: lane = 4
-            if key==K_g: lane = 5
+            if key==pygame.K_DOWN: yacc = 1 
+            if key==pygame.K_UP: yacc = -1
+            if key==pygame.K_RIGHT: xacc = 1
+            if key==pygame.K_LEFT: xacc = -1
+            if key==pygame.K_1: lanenum = 1
+            if key==pygame.K_2: lanenum = 2
+            if key==pygame.K_3: lanenum = 3
+            if key==pygame.K_4: lanenum = 4
+            if key==pygame.K_5: lanenum = 5
+            if key==pygame.K_a: lane = 1
+            if key==pygame.K_s: lane = 2
+            if key==pygame.K_d: lane = 3
+            if key==pygame.K_f: lane = 4
+            if key==pygame.K_g: lane = 5
+            if key==pygame.K_h: lane = 6
+            if key==pygame.K_j: lane = 7
 
         # update opponent spawning
         if OPPONENTCARSPAWN in self.events: self.events.remove(OPPONENTCARSPAWN)
@@ -113,15 +112,14 @@ class gamemgr:
             self.objects[0].accelerate([xacc,yacc])
 
         # update main character status: state 2
-        if self.state==2 and lane!=0:
+        if self.state==2 and lane!=0 and lane<=self.background.lanenum:
             pos = np.array(self.background.spawnpoint[lane-1])
             pos[1] = self.objects[0].position[1]
             self.objects[0].settarget(pos)
 
         # update main background status: state 2
         if lanenum!=0:
-            print lanenum
-            self.updatespawnpoint(lanenum)
+            self.background.updatespawnpoint(lanenum)
 
         # update other objects status
         while self.collideds:
@@ -148,7 +146,7 @@ class gamemgr:
         spd = main.speed
         self.status.update( "game mode: %d"%self.state )
         self.status.update( "position: %d,%d"%( pos[0], pos[1] ))
-        #self.status.update( "speed: %d,%d"%( spd[0], spd[1] ))
+        self.status.update( "speed: %d,%d"%( spd[0], spd[1] ))
         self.status.update( "hit: %d"%len(self.collideds) )
         self.background.update()
 

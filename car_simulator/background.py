@@ -1,11 +1,13 @@
 import pygame
 import numpy as np
 
+BACKGROUND_SPEED = 6
 ROADWIDTH = 50
-MID = 500
+MID = 512
 
 BOUND_YMAX = 768
 BOUND_YMIN = 0
+WALL = 20
 
 class background:
 
@@ -15,23 +17,18 @@ class background:
         self.roadfigure = pygame.image.load(frname)
         self.surface = pygame.transform.scale(self.surface, (1024,768*2))
         self.rect = self.surface.get_rect()
-
-        self.lanenum = lanenum
+        self.position = np.array([posx,posy])
         self.updatespawnpoint(lanenum)
 
-        self.position = np.array([posx,posy])
-        self.roadpositions = [np.array([pos[0], self.position[1]]) for pos in self.spawnpoint]
-
     def update(self):
-        self.position += np.array([0,2])
+        self.position += np.array([0,BACKGROUND_SPEED])
         if self.position[1] == 0: self.reload()
-        self.roadpositions = [np.array([pos[0], self.position[1]]) for pos in self.spawnpoint]
         self.rect = self.surface.get_rect()
         self.rect.left,self.rect.top = tuple(self.position)
         self.roadrects = []
         for i,surf in enumerate(self.roadsurfaces):
             rect = surf.get_rect()
-            rect.center = tuple(self.spawnpoint[i])
+            rect.center = tuple(self.spawnpoint[i+1])
             rect.top = self.position[1]
             self.roadrects.append(rect)
 
@@ -39,8 +36,10 @@ class background:
         self.position = np.array([0,-768])
 
     def updatespawnpoint(self, lanenum):
-        self.roadsurfaces = [pygame.transform.scale(self.roadfigure, (ROADWIDTH,768*2))]*lanenum
-        bias = MID - ROADWIDTH * lanenum/4
+        self.roadsurfaces = [pygame.transform.scale(self.roadfigure, (ROADWIDTH,768*2))]*(lanenum)
+        lanenum += 2 # out of ordinary road
+        self.lanenum = lanenum
+        bias = MID - ROADWIDTH * lanenum/2
         self.spawnpoint = [ np.array([ bias+n*ROADWIDTH ,-30]) for n in range(0,lanenum) ]
-        self.minbound = np.array([MID-ROADWIDTH*(1+lanenum/2), BOUND_YMIN])
-        self.maxbound = np.array([MID+ROADWIDTH*(1+lanenum/2), BOUND_YMAX])
+        self.minbound = np.array([self.spawnpoint[0][0]-WALL, BOUND_YMIN])
+        self.maxbound = np.array([self.spawnpoint[lanenum-1][0]+WALL, BOUND_YMAX])

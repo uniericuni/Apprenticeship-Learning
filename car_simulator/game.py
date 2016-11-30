@@ -7,6 +7,7 @@ from background import *
 from font import *
 
 OPPONENTCARSPAWN = pygame.USEREVENT+1
+TIMEDELTA = 30
 
 # game manager object
 class gamemgr:
@@ -22,7 +23,7 @@ class gamemgr:
 
         # game clock initialization
         self.clock = pygame.time.Clock()
-        pygame.time.set_timer(OPPONENTCARSPAWN, 30*100)
+        pygame.time.set_timer(OPPONENTCARSPAWN, TIMEDELTA*100)
 
         # object queue initialization
         self.objects = []
@@ -50,7 +51,7 @@ class gamemgr:
     def input(self):
 
         # game clock
-        self.clock.tick(30)
+        self.clock.tick(TIMEDELTA)
 
         # events handling
         for event in pygame.event.get(): 
@@ -64,7 +65,8 @@ class gamemgr:
                 elif event.key == K_ESCAPE: self.state = 0
                 elif event.key==K_SPACE:
                     if self.state==1: self.state = 2
-                    elif self.state==2: self.state = 1
+                    elif self.state==2: self.state = 3
+                    elif self.state==3: self.state = 1
                 else: 
                     self.events.append(event.key)
             elif event.type==KEYUP:
@@ -87,8 +89,8 @@ class gamemgr:
                 pos = self.background.spawnpoint[l]
                 op_car = car(fname=IMAGE_PATH+'opponent_car.png', posx=pos[0], posy=pos[1], spdy=random.uniform(4,12) ,sc=0.1, isdrag=False)
                 self.objects.append(op_car)
-            if key==pygame.K_DOWN: yacc = 1 
-            if key==pygame.K_UP: yacc = -1
+            #if key==pygame.K_DOWN: yacc = 1 
+            #if key==pygame.K_UP: yacc = -1
             if key==pygame.K_RIGHT: xacc = 1
             if key==pygame.K_LEFT: xacc = -1
             if key==pygame.K_1: lanenum = 1
@@ -144,10 +146,27 @@ class gamemgr:
         # update background and font interface
         pos = main.position
         spd = main.speed
+        onLane = 0
+        dist = float('inf')
+        for i,sp in enumerate(self.background.spawnpoint):
+            if abs(sp[0]-main.position[0])<dist:
+                dist = abs(sp[0]-main.position[0])
+                onLane = i
+        dist = float('inf')
+        for obj in self.objects[1:]:
+            if int(obj.position[0])==int(self.background.spawnpoint[onLane][0]):
+                if abs(dist) > abs(main.position[1]-obj.position[1]):
+                    dist = main.position[1]-obj.position[1]
+        if dist>=350: qdist = 4
+        elif dist<-449: qdist = -5
+        else: qdist = int((dist+450)/100)-5
+            
         self.status.update( "game mode: %d"%self.state )
         self.status.update( "position: %d,%d"%( pos[0], pos[1] ))
         self.status.update( "speed: %d,%d"%( spd[0], spd[1] ))
-        self.status.update( "hit: %d"%len(self.collideds) )
+        self.status.update( "lane: %d"%onLane )
+        self.status.update( "nearest distance: %.3f"%dist )
+        self.status.update( "quantized distance: %d"%qdist )
         self.background.update()
 
         # remove redundant objects
@@ -156,6 +175,13 @@ class gamemgr:
         # collision cars
         for collider in self.collideds:
             collider.load( IMAGE_PATH+'hit_car.png' )
+
+        # feature parser
+        f = [0]*(self.background.lanenum+10)
+        f[onLane] = 1
+        f[qdist+10] = 1
+        
+        return f
 
     def render(self):
 

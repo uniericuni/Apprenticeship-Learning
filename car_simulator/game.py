@@ -34,12 +34,12 @@ class gamemgr:
         self.background = background(fname=IMAGE_PATH+'bg.png')
         self.status = font(FONT,FONTSIZE, (40,200))
         self.instruction = font(FONT,FONTSIZE, (40,40))
-        self.instruction.update( "GAME INSTRUCTION"             )
-        self.instruction.update( "-------------------"          ) 
-        self.instruction.update( "SPACE: CHANGE MODE"           )
-        self.instruction.update( "RIGHT: MOVE RIGHT"            )
-        self.instruction.update( "LEFT: MOVE LEFT"              )
-        self.instruction.update( "NUMBER: CHANGE LANE"          )
+        self.instruction.update( "GAME INSTRUCTION"                             )
+        self.instruction.update( "-------------------"                          ) 
+        self.instruction.update( "SPACE: CHANGE GMAE MODE"                      )
+        self.instruction.update( "ARROW KEY: MOVE (UNDER MODE 1)"               )
+        self.instruction.update( "NUMBER: CHANGE LANE NUMBER (UNDER MODE 2)"    )
+        self.instruction.update( "A-G: CHANGE (UNDER MODE 2)"                   )
 
         # event message
         self.events = []
@@ -89,23 +89,27 @@ class gamemgr:
             if key==K_UP: yacc = -1
             if key==K_RIGHT: xacc = 1
             if key==K_LEFT: xacc = -1
-            if key==K_1: lane = 1
-            if key==K_2: lane = 2
-            if key==K_3: lane = 3
-            if key==K_4: lane = 4
-            if key==K_5: lane = 5
-            if key==K_6: lane = 6
-            if key==K_7: lane = 7
-            if key==K_8: lane = 8
-            if key==K_9: lane = 9
+            if key==K_1: lanenum = 1
+            if key==K_2: lanenum = 2
+            if key==K_3: lanenum = 3
+            if key==K_4: lanenum = 4
+            if key==K_5: lanenum = 5
+            if key==K_a: lane = 1
+            if key==K_s: lane = 2
+            if key==K_d: lane = 3
+            if key==K_f: lane = 4
+            if key==K_g: lane = 5
 
         # update opponent spawning
         if OPPONENTCARSPAWN in self.events: self.events.remove(OPPONENTCARSPAWN)
 
-        # update main character status
+        # update main character status: state 1
         if self.state==1:
             self.objects[0].accelerate([xacc,yacc])
+
+        # update main character status: state 2
         if self.state==2 and lane!=0:
+            print lane
             pos = np.array(self.background.spawnpoint[lane-1])
             pos[1] = self.objects[0].position[1]
             self.objects[0].settarget(pos)
@@ -132,9 +136,10 @@ class gamemgr:
 
         # update background and font interface
         pos = main.position
-        self.status.update( "game state: %d"%self.state )
+        spd = main.speed
+        self.status.update( "game mode: %d"%self.state )
         self.status.update( "position: %d,%d"%( pos[0], pos[1] ))
-        self.status.update( "lane: %d"%1 )
+        #self.status.update( "speed: %d,%d"%( spd[0], spd[1] ))
         self.status.update( "hit: %d"%len(self.collideds) )
         self.background.update()
 

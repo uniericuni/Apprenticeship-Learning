@@ -1,0 +1,7 @@
+*.pdf
+*.doc
+*.docx
+*.pyc
+*.svg
+
+*.DS_Store

@@ -163,24 +163,24 @@ class ApproximateQLearningAgent(Agent):
 
     # overrid this function 
     def getStateFeature(self, state):
-    """
-    return features base on state
-    """
+        """
+        return features base on state
+        """
         pass
 
     # overrid this function 
     def getFeatures(self, state, action):
-    """
-    return features base on state and action
-    """
+        """
+        return features base on state and action
+        """
         pass
 
     # overrid this function 
     def getLegalActions(self, state):
-    """
-    return legal actions.
-    if no actions return None
-    """
+        """
+        return legal actions.
+        if no actions return None
+        """
         pass
 
 

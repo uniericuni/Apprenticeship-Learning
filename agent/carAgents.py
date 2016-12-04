@@ -6,9 +6,9 @@ class CarAgent(ApproximateQLearningAgent):
         super(CarAgent, self).__init__(w, mode, alpha, epsilon, gamma)
 
     def getStateFeature(self, state):
-    """
-    return features base on state
-    """
+        """
+        return features base on state
+        """
         lane = np.zeros((1, state[0].shape[0]))
         for i in range(state[0].shape[0]):
             if state[0][i][0] == 1:
@@ -17,9 +17,9 @@ class CarAgent(ApproximateQLearningAgent):
         return np.concatenate((lane, state[0][i][1:]))
 
     def getFeatures(self, state, action):
-    """
-    return features base on state and action
-    """
+        """
+        return features base on state and action
+        """
         lane = np.zeros((1, state[0].shape[0]))
         lane[action] = 1.0
         return np.concatenate((lane, state[0][action][1:]))

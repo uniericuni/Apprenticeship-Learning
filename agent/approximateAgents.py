@@ -1,9 +1,5 @@
 # an approximate q learning agent
-import util
-import random
-from game import Directions, Agent, Actions
-from game import *
-from featureExtractors import *
+import numpy as np
 
 class AgentMode(Enum):
     """
@@ -18,6 +14,7 @@ class ApproximateQLearningAgent(Agent):
     """
     Abstract class of approximate q-learning agent.
     Must override 
+        getStateFeature(self, state)
         getFeatures(self, state, action)
         getLegalActions(self, state)
 
@@ -74,9 +71,8 @@ class ApproximateQLearningAgent(Agent):
         self.lastState = None
         self.lastAction = None
         self.episodeRewards = 0.0
-        self.miu = state
+        self.miu = self.getStateFeature(state)
         self.t = 0
-        # self.weights = np.zeros(self.getFeatures(state))
     
     def getAction(self, state):
         """
@@ -123,21 +119,21 @@ class ApproximateQLearningAgent(Agent):
         else:
             self.weights += self.alpha * correction * features
         if isInEstimating:
-            self.miu += nextState * self.gamma ** self.t
+            self.miu += self.getStateFeatrure(self.nextState) * self.gamma ** self.t
       
 
     ##############################
     # getter for learning values #
     ##############################
     def getScore(self, state):
-        return self.w.T.dot(state)
+        return self.w.T.dot(seelf.getStateFeature(state))
 
     def getQValue(self, state, action):
         if self.weights
             features = self.getFeatures(state, action)
             return self.weights.T.dot(features)
         else:
-            return 0
+            return 0.0
   
     def getValue(self, state):
         actions = self.getLegalActions( state )
@@ -157,6 +153,13 @@ class ApproximateQLearningAgent(Agent):
 
     def getfeatureExpection(self):
         return self.miu
+
+    # overrid this function 
+    def getStateFeature(self, state):
+    """
+    return features base on state
+    """
+        pass
 
     # overrid this function 
     def getFeatures(self, state, action):

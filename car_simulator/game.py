@@ -203,10 +203,11 @@ class gamemgr:
         # feature parser
         legal_action = np.array([1,2,3,4,5])
         if self.state==100:
-            f = np.zeros([5,15]).astype('int')
-            f[:5,:5] = np.diag(np.ones(5).astype('int'))
+            f = np.zeros([5,11]).astype('int')
+            f[onLane,0] = 1
             for i in range(0,5):
-                f[i,qdist[i]+10] = 1
+                f[i,qdist[i]+6] = 1
+            print f
             return f,legal_action
         elif self.record:
             f = [0]*15

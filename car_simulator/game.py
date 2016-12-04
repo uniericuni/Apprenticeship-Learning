@@ -201,7 +201,7 @@ class gamemgr:
             collider.load( IMAGE_PATH+'hit_car.png' )
 
         # feature parser
-        legal_action = np.array([1,2,3,4,5])
+        legal_action = np.array([0,1,2,3,4])
         if self.state==100:
             f = np.zeros([5,11]).astype('int')
             f[onLane,0] = 1

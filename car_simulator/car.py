@@ -37,7 +37,7 @@ class car:
 #                                                                                                   # 
 #####################################################################################################
     
-    def __init__(self, fname, posx=512, posy=384, spdx=0, spdy=0, accx=0, accy=0, sc=1, rt=0, isdrag=True):
+    def __init__(self, fname, posx=512, posy=384, spdx=0, spdy=0, accx=0, accy=0, sc=1, rt=0, isdrag=True, lane=3):
         self.sc = sc
         self.rt = rt
         self.position = np.array([posx,posy])
@@ -46,6 +46,7 @@ class car:
         self.accelerate(np.array([accx,accy]))
         self.isdrag = isdrag
         self.istargeting = False
+        self.lane = lane
 
     def load(self, fname):
         self.figure = pygame.image.load(fname)

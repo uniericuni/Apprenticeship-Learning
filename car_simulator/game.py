@@ -14,7 +14,7 @@ RECORDSIGNINTERVAL = 5
 # game manager object
 class gamemgr:
 
-    def __init__(self):
+    def __init__(self, state=1):
         
         # random seed
         random.seed() 
@@ -50,11 +50,11 @@ class gamemgr:
         self.events = []
 
         # state init
-        self.state = 1
+        self.state = state
         self.record = False
         self.recordsign = RECORDSIGNINTERVAL
 
-    def input(self):
+    def input(self, action=None):
 
         # game clock
         self.clock.tick(TIMEDELTA)
@@ -82,6 +82,14 @@ class gamemgr:
                 if not hasattr(event, 'key'): continue
                 if event.key in self.events: self.events.remove(event.key)
 
+        # training mode
+        if self.state==100:
+            if action==1: self.events.append(pygame.K_a)
+            elif action==2: self.events.append(pygame.K_s)
+            elif action==3: self.events.append(pygame.K_d)
+            elif action==4: self.events.append(pygame.K_f)
+            elif action==5: self.events.append(pygame.K_g)
+
         # return game state
         return self.state
 
@@ -97,7 +105,7 @@ class gamemgr:
             if key==OPPONENTCARSPAWN:
                 l = random.randint(1,self.background.lanenum-2)
                 pos = self.background.spawnpoint[l]
-                op_car = car(fname=IMAGE_PATH+'opponent_car.png', posx=pos[0], posy=pos[1], spdy=random.uniform(4,12) ,sc=0.1, isdrag=False)
+                op_car = car(fname=IMAGE_PATH+'opponent_car.png', posx=pos[0], posy=pos[1], spdy=random.uniform(4,12) ,sc=0.1, isdrag=False, lane=l)
                 self.objects.append(op_car)
             if key==RECORDSIGN:
                 self.recordsign = RECORDSIGNINTERVAL
@@ -127,7 +135,7 @@ class gamemgr:
             self.objects[0].accelerate([xacc,yacc])
 
         # update main character status: state 2
-        if self.state==2 and lane!=0 and lane<=self.background.lanenum:
+        if lane!=0 and lane<=self.background.lanenum:
             pos = np.array(self.background.spawnpoint[lane-1])
             pos[1] = self.objects[0].position[1]
             self.objects[0].settarget(pos)
@@ -165,21 +173,24 @@ class gamemgr:
             if abs(sp[0]-main.position[0])<dist:
                 dist = abs(sp[0]-main.position[0])
                 onLane = i
-        dist = float('inf')
+        dist = np.array([float('inf')]*5)
         for obj in self.objects[1:]:
-            if int(obj.position[0])==int(self.background.spawnpoint[onLane][0]):
-                if abs(dist) > abs(main.position[1]-obj.position[1]):
-                    dist = main.position[1]-obj.position[1]
-        if dist>=350: qdist = 4
-        elif dist<-449: qdist = -5
-        else: qdist = int((dist+450)/100)-5
+            l = obj.lane
+            if abs(dist[l]) > abs(main.position[1]-obj.position[1]):
+                    dist[l] = main.position[1]-obj.position[1]
+        qdist = (dist+450)/100-5
+        qdist[np.where(dist>=350)]=4
+        qdist[np.where(dist<-449)]=-5
+        qdist = qdist.astype('int')
             
         self.status.update( "game mode: %d"%self.state )
         self.status.update( "position: %d,%d"%( pos[0], pos[1] ))
         self.status.update( "speed: %d,%d"%( spd[0], spd[1] ))
         self.status.update( "lane: %d"%onLane )
-        self.status.update( "nearest distance: %.3f"%dist )
-        self.status.update( "quantized distance: %d"%qdist )
+        for i in range(0,5):
+            self.status.update( "nearest distance: %.3f"%dist[i] )
+        for i in range(0,5):
+            self.status.update( "quantized distance: %d"%qdist[i] )
         self.background.update()
 
         # remove redundant objects
@@ -190,14 +201,20 @@ class gamemgr:
             collider.load( IMAGE_PATH+'hit_car.png' )
 
         # feature parser
-        if self.record:
+        legal_action = np.array([1,2,3,4,5])
+        if self.state==100:
+            f = np.zeros([5,15]).astype('int')
+            f[:5,:5] = np.diag(np.ones(5).astype('int'))
+            for i in range(0,5):
+                f[i,qdist[i]+10] = 1
+            return f,legal_action
+        elif self.record:
             f = [0]*15
             f[onLane] = 1
-            f[qdist+10] = 1
-            return f
+            f[qdist[onLane]+10] = 1
+            return f,legal_action
         else:
-            return None
-        
+            return None,legal_action
 
     def render(self):
 

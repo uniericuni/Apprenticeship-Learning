@@ -5,95 +5,186 @@ from game import Directions, Agent, Actions
 from game import *
 from featureExtractors import *
 
-class ApproximateAgent(Agent):
-    """docstring for ApproximateAgent"""
-    def __init__(self, actionFn=None, alpha=0.2, epsilon=0.05, gamma=0.8, numTraining=100, extractor='IdentityExtractor'):
-        if actionFn == None:
-            actionFn = lambda state: state.getLegalActions()
-        self.actionFn = actionFn
-        self.episodesSoFar = 0
-        self.accumTrainRewards = 0.0 
-        self.accumTestRewards = 0.0
-        self.numTraining = int(numTraining)
-        self.epsilon = float(epsilon)
-        self.alpha = float(alpha)
+class AgentMode(Enum):
+    """
+    modes of agents
+    """
+    estimating = 1
+    training = 2
+    testing = 3
+        
+
+class ApproximateQLearningAgent(Agent):
+    """
+    Abstract class of approximate q-learning agent.
+    Must override 
+        getFeatures(self, state, action)
+        getLegalActions(self, state)
+
+    Attributes:
+        epsilon         exploration rate
+        alpha           learning rate
+        gamma           discount rate
+        trainEpsilon    exploration rate value
+        trainAlpha      learning rate value
+        mode            agent mode, esimating, training or testing
+        w               reward vector
+        t               time
+        weights         approximate q table weights
+        miu             expection of features
+        lastState       previous state
+        lastAction      previous action
+
+    Methods:
+        __init__(self, alpha, epsilon, gamma, w): initialize
+
+        registerInitialState(self, state): call before game starts
+        getAction(self, state): call in game, give a state return an action
+        final(self, state): call after game ends
+
+        observeTransition(self, state, action, nextState, deltaReward): observe transition of states
+        update(self, state, action, nextState, reward): update parameters
+
+        getScore(self, state): return reward based on state
+        getQValue(self, state, action): get q value
+    """
+    def __init__(self, alpha=0.2, epsilon=0.05, gamma=0.8, w):
+        self.trainEpsilon = float(epsilon)
+        self.trainAlpha = float(alpha)
         self.gamma = float(gamma)
+        self.weights = None
+        self.mode = None
+        self.w = w
+        self.t = 0
 
-        self.featExtractor = util.lookup(extractor, globals())()
-        self.weights = util.Counter()
-        self.index = 0
+    ##########################
+    # methods called in game #
+    ##########################
+    def registerInitialState(self, state):
+        """
+        call before game
+        """
+        if self.isInTraining():
+            self.epsilon = self.trainEpsilon
+            self.alpha = self.trainAlpha
+        else:
+            self.epsilon = 0.0
+            self.alpha = 0.0
 
-    # from approximate q-learning
-    def getQValue(self, state, action):
-        feats = self.featExtractor.getFeatures( state, action )
-        return feats * self.weights
+        self.lastState = None
+        self.lastAction = None
+        self.episodeRewards = 0.0
+        self.miu = state
+        self.t = 0
+        # self.weights = np.zeros(self.getFeatures(state))
     
-    def update(self, state, action, nextState, reward):
-        feats = self.featExtractor.getFeatures( state, action )
-        correction = reward + self.gamma * self.getValue( nextState ) - self.getQValue( state, action )
-        keys = feats.keys()
-        for key in keys:
-            self.weights[key] += self.alpha * correction * feats[key]
-        return
-
     def getAction(self, state):
+        """
+        call in each step of game,
+        give a state return an action
+        """
+        if not self.lastState is None: 
+            reward = self.getScore(state) - self.getScore(self.lastState)
+            self.observeTransition(self.lastState, self.lastAction, state, reward)
+
         legalActions = self.getLegalActions(state)
         action = None
         if legalActions:
-            if util.flipCoin( self.epsilon ):
-                action = random.choice( legalActions )
+            if np.random.rand(1) < self.epsilon:
+                action = np.random.choice( legalActions, 1 )[0]
             else:
                 action = self.getPolicy( state )
         self.doAction(state,action)
         return action
 
-    # from q-learning
+    def final(self, state):
+        """
+        call after the game
+        """
+        deltaReward = self.getScore(state) - self.getScore(self.lastState)
+        self.observeTransition(self.lastState, self.lastAction, state, deltaReward)
+
+
+    ##################
+    # helper methods #
+    ##################
+    def observeTransition(self, state, action, nextState, deltaReward):
+        self.episodeRewards += deltaReward
+        self.update(state, action, nextState, deltaReward)
+
+    def update(self, state, action, nextState, reward):
+        """
+        update weights and miu if in estimating mode
+        """
+        features = self.getFeatures( state, action )
+        correction = reward + self.gamma * self.getValue( nextState ) - self.getQValue( state, action )
+        if not self.weights:
+            self.weights = self.alpha * correction * features
+        else:
+            self.weights += self.alpha * correction * features
+        if isInEstimating:
+            self.miu += nextState * self.gamma ** self.t
+      
+
+    ##############################
+    # getter for learning values #
+    ##############################
+    def getScore(self, state):
+        return self.w.T.dot(state)
+
+    def getQValue(self, state, action):
+        if self.weights
+            features = self.getFeatures(state, action)
+            return self.weights.T.dot(features)
+        else:
+            return 0
   
     def getValue(self, state):
         actions = self.getLegalActions( state )
         if not actions:
             return 0.0
-
-        return max( [ self.getQValue( state, action ) for action in actions ] )
+        else:
+            return max( [ self.getQValue( state, action ) for action in actions ] )
     
     def getPolicy(self, state):
         actions = self.getLegalActions( state )
         if not actions:
-          return None
-
-        maxQ = self.getValue( state )
-        bestActions = [ action for action in actions if self.getQValue( state, action ) == maxQ ]
-        return random.choice( bestActions )
-
-    # from reinforcement learning
-    def getLegalActions(self, state):
-        return self.actionFn(state)
-
-    def observeTransition(self, state, action, nextState, deltaReward):
-        self.episodeRewards += deltaReward
-        self.update(state, action, nextState, deltaReward)
-
-    def startEpisode(self):
-        self.lastState = None
-        self.lastAction = None
-        self.episodeRewards = 0.0
-
-    def stopEpisode(self):
-        if self.episodesSoFar < self.numTraining:
-            self.accumTrainRewards += self.episodeRewards
+            return None
         else:
-            self.accumTestRewards += self.episodeRewards
-        self.episodesSoFar += 1    
-        if self.episodesSoFar >= self.numTraining:
-                # Take off the training wheels
-            self.epsilon = 0.0    # no exploration
-            self.alpha = 0.0      # no learning
-    
+            maxQ = self.getValue( state )
+            bestActions = [ action for action in actions if self.getQValue( state, action ) == maxQ ]
+            return np.random.choice( bestActions, 1 )[0]
+
+    def getfeatureExpection(self):
+        return self.miu
+
+    # overrid this function 
+    def getFeatures(self, state, action):
+    """
+    return features base on state and action
+    """
+        pass
+
+    # overrid this function 
+    def getLegalActions(self, state):
+    """
+    return legal actions.
+    if no actions return None
+    """
+        pass
+
+
+    #####################
+    # getter and setter #
+    #####################
+    def isInEstimating(self):
+        return self.mode == AgentMode.estimating
+
     def isInTraining(self): 
-        return self.episodesSoFar < self.numTraining
+        return self.mode == AgentMode.training
   
     def isInTesting(self):
-        return not self.isInTraining()
+        return self.mode == AgentMode.testing
 
     def setEpsilon(self, epsilon):
         self.epsilon = epsilon
@@ -107,50 +198,5 @@ class ApproximateAgent(Agent):
     def doAction(self,state,action):
         self.lastState = state
         self.lastAction = action
-  
-    def observationFunction(self, state):
-        if not self.lastState is None: 
-            reward = state.getScore() - self.lastState.getScore()
-            self.observeTransition(self.lastState, self.lastAction, state, reward)
-        return state    
-     
-    def registerInitialState(self, state):
-        self.startEpisode()      
-        if self.episodesSoFar == 0:
-            print 'Beginning %d episodes of Training' % (self.numTraining)
-    
-    def final(self, state):
-        deltaReward = state.getScore() - self.lastState.getScore()
-        self.observeTransition(self.lastState, self.lastAction, state, deltaReward)
-        self.stopEpisode()
-    
-        # Make sure we have this var
-        if not 'episodeStartTime' in self.__dict__:
-            self.episodeStartTime = time.time()
-        if not 'lastWindowAccumRewards' in self.__dict__:
-            self.lastWindowAccumRewards = 0.0
-        self.lastWindowAccumRewards += state.getScore()
-        
-        NUM_EPS_UPDATE = 100
-        if self.episodesSoFar % NUM_EPS_UPDATE == 0:
-            print 'Reinforcement Learning Status:'
-            windowAvg = self.lastWindowAccumRewards / float(NUM_EPS_UPDATE)
-            if self.episodesSoFar <= self.numTraining:
-                trainAvg = self.accumTrainRewards / float(self.episodesSoFar)                
-                print '\tCompleted %d out of %d training episodes' % (
-                       self.episodesSoFar,self.numTraining)
-                print '\tAverage Rewards over all training: %.2f' % (
-                        trainAvg)
-            else:
-                testAvg = float(self.accumTestRewards) / (self.episodesSoFar - self.numTraining)
-                print '\tCompleted %d test episodes' % (self.episodesSoFar - self.numTraining)
-                print '\tAverage Rewards over testing: %.2f' % testAvg
-            print '\tAverage Rewards for last %d episodes: %.2f'  % (
-                    NUM_EPS_UPDATE,windowAvg)
-            print '\tEpisode took %.2f seconds' % (time.time() - self.episodeStartTime)
-            self.lastWindowAccumRewards = 0.0
-            self.episodeStartTime = time.time()
-            
-        if self.episodesSoFar == self.numTraining:
-            msg = 'Training Done (turning off epsilon and alpha)'
-            print '%s\n%s' % (msg,'-' * len(msg))
+        self.t += 1
+

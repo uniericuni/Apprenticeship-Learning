@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
         # main game loop
         status = gamemgr.input(action)
-        feature,legal_action = gamemgr.update()
+        state,legal_action = gamemgr.update()
         gamemgr.render()
 
         # feature export

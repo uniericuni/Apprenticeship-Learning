@@ -10,7 +10,7 @@ class AgentMode:
     testing = 3
         
 
-class ApproximateQLearningAgent(Agent):
+class ApproximateQLearningAgent:
     """
     Abstract class of approximate q-learning agent.
     Must override 

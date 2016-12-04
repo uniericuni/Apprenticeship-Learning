@@ -24,7 +24,7 @@ if __name__ == '__main__':
     agent.registerInitialState((state,legal_action))
 
     # main game loop
-    while gamemgr.state or counter>MAX_ITERATION:
+    while gamemgr.state and counter<MAX_ITERATION:
 
         # action assignment
         action = agent.getAction((state,legal_action))
@@ -41,8 +41,9 @@ if __name__ == '__main__':
             timestr = time.strftime('%y%m%d%H%M%S')
             sio.savemat('%s%s_record.mat'%(CAR_RECORD_PATH,timestr), {'features':features})
             features = []
+        counter += 1
         
-    # counter
+    # final
     agent.final((state,legal_action))
 
     # feature export

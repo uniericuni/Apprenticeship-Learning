@@ -207,7 +207,6 @@ class gamemgr:
             f[onLane,0] = 1
             for i in range(0,5):
                 f[i,qdist[i]+6] = 1
-            print f
             return f,legal_action
         elif self.record:
             f = [0]*15

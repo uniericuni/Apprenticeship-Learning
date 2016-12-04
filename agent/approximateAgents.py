@@ -44,8 +44,15 @@ class ApproximateQLearningAgent(Agent):
 
         getScore(self, state): return reward based on state
         getQValue(self, state, action): get q value
+
+
+    Ussage:
+        To run a game
+        1. initialize agent
+        2. 
+
     """
-    def __init__(self, w, alpha=0.2, epsilon=0.05, gamma=0.8):
+    def __init__(self, w, mode=AgentMode.estimating, alpha=0.2, epsilon=0.05, gamma=0.8):
         self.trainEpsilon = float(epsilon)
         self.trainAlpha = float(alpha)
         self.gamma = float(gamma)

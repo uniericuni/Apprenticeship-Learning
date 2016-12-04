@@ -3,16 +3,17 @@ from approximateAgents import *
 
 class inverseLearning:
     """docstring for inverseLearning"""
-    def __init__(self, gamma, numEstimating, numTraining):
-        self.gamma = gamma
+    def __init__(self, agent, numEstimating, numTraining):
+        self.agent = agent
+        self.gamma = agent.getGamma()
         self.numEstimating = numEstimating
         self.numTraining = numTraining
 
         self.featureSize = 0
         self.w = np.zeros((self.featureSize,1))
-        self.mius = []
-        self.miuBar = None
-        self.miuExpert = None
+        self.mus = []
+        self.muBar = None
+        self.muExpert = None
         
         pass
         
@@ -31,26 +32,27 @@ class inverseLearning:
 
     def featureExpection(self):
         self.agent.setMode(AgentMode.estimating)
-        miu = np.zeros((self.featureSize, 1))
+        mu = np.zeros((self.featureSize, 1))
         for i in range(self.numEstimating):
             self.runGame()
-            miu += self.agent.getfeatureExpection()
-        self.mius.append(miu / numEstimating)
+            mu += self.agent.getfeatureExpection()
+        self.mus.append(mu / numEstimating)
 
     def updateRewardFunction(self):
-        if self.miuBar = None:
-            self.miuBar = self.mius[0]
-            miuBar = self.miuBar
+        if self.muBar = None:
+            self.muBar = self.mus[0]
+            muBar = self.muBar
         else:
-            coef = (self.mius[-1] - self.miuBar).T.dot(self.miuExpert - self.miuBar)
-            coef = coef / (self.mius[-1] - self.miuBar).T.dot(self.mius[-1] - self.miuBar)
-            miuBar = self.miuBar + coef * (self.mius[-1] - self.miuBar)
-        self.w = self.miuExpert - miuBar
+            coef = (self.mus[-1] - self.muBar).T.dot(self.muExpert - self.muBar)
+            coef = coef / (self.mus[-1] - self.muBar).T.dot(self.mus[-1] - self.muBar)
+            muBar = self.muBar + coef * (self.mus[-1] - self.muBar)
+        self.w = self.muExpert - muBar
+        self.muBar = muBar
+        self.agent.setRewardVector(self.w)
         return np.linalg.norm(self.w)
         
     def updateAgent(self):
         self.agent.setMode(AgentMode.training)
-        self.agent.setRewardVector(self.w)
         for i in range(self.numTraining):
             self.runGame()
 

@@ -25,4 +25,4 @@ class CarAgent(ApproximateQLearningAgent):
         return np.concatenate((lane, state[0][action][1:]))
 
     def getLegalActions(self, state):
-    return state[1]
+        return state[1]

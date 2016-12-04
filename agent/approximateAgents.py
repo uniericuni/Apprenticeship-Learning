@@ -1,5 +1,6 @@
 # an approximate q learning agent
 import numpy as np
+from enum import Enum
 
 class AgentMode(Enum):
     """
@@ -136,7 +137,7 @@ class ApproximateQLearningAgent(Agent):
         return self.w.T.dot(seelf.getStateFeature(state))
 
     def getQValue(self, state, action):
-        if self.weights
+        if self.weights:
             features = self.getFeatures(state, action)
             return self.weights.T.dot(features)
         else:

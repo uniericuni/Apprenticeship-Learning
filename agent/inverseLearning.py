@@ -18,25 +18,30 @@ class inverseLearning:
         pass
         
     def train(self):
-        self.featureExpection()
+        self.featureExpectation()
         t = self.updateRewardFunction()
 
         while t > self.error:
             self.updateAgent()
-            self.featureExpection()
+            self.featureExpectation()
             t = self.updateRewardFunction()
 
     # override this function
-    def computeExpertExpection(self):
+    def computeExpertExpectation(self):
         pass
 
-    def featureExpection(self):
+    def featureExpectation(self):
         self.agent.setMode(AgentMode.estimating)
         mu = np.zeros((self.featureSize, 1))
         for i in range(self.numEstimating):
             self.runGame()
+<<<<<<< HEAD
             mu += self.agent.getfeatureExpection()
         self.mus.append(mu / numEstimating)
+=======
+            miu += self.agent.getfeatureExpectation()
+        self.mius.append(miu / numEstimating)
+>>>>>>> 7622421ec4255f9522fe6b322d9d2cfc67214b90
 
     def updateRewardFunction(self):
         if self.muBar = None:

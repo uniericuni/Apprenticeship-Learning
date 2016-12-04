@@ -91,8 +91,9 @@ class ApproximateQLearningAgent:
             self.observeTransition(self.lastState, self.lastAction, state, reward)
 
         legalActions = self.getLegalActions(state)
+        print legalActions
         action = None
-        if legalActions:
+        if legalActions.size:
             if np.random.rand(1) < self.epsilon:
                 action = np.random.choice( legalActions, 1 )[0]
             else:
@@ -121,11 +122,11 @@ class ApproximateQLearningAgent:
         """
         features = self.getFeatures( state, action )
         correction = reward + self.gamma * self.getValue( nextState ) - self.getQValue( state, action )
-        if not self.weights:
+        if self.weights == None:
             self.weights = self.alpha * correction * features
         else:
             self.weights += self.alpha * correction * features
-        if isInEstimating:
+        if self.isInEstimating():
             self.mu += self.getStateFeatrure(self.nextState) * self.gamma ** self.t
       
 
@@ -133,10 +134,10 @@ class ApproximateQLearningAgent:
     # getter for learning values #
     ##############################
     def getScore(self, state):
-        return self.w.T.dot(seelf.getStateFeature(state))
+        return self.w.T.dot(self.getStateFeature(state))
 
     def getQValue(self, state, action):
-        if self.weights:
+        if self.weights != None:
             features = self.getFeatures(state, action)
             return self.weights.T.dot(features)
         else:
@@ -144,14 +145,14 @@ class ApproximateQLearningAgent:
   
     def getValue(self, state):
         actions = self.getLegalActions( state )
-        if not actions:
+        if not actions.size:
             return 0.0
         else:
             return max( [ self.getQValue( state, action ) for action in actions ] )
     
     def getPolicy(self, state):
         actions = self.getLegalActions( state )
-        if not actions:
+        if not actions.size:
             return None
         else:
             maxQ = self.getValue( state )

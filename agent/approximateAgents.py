@@ -28,7 +28,7 @@ class ApproximateQLearningAgent(Agent):
         w               reward vector
         t               time
         weights         approximate q table weights
-        miu             expection of features
+        mu              expection of features
         lastState       previous state
         lastAction      previous action
 
@@ -78,7 +78,7 @@ class ApproximateQLearningAgent(Agent):
         self.lastState = None
         self.lastAction = None
         self.episodeRewards = 0.0
-        self.miu = self.getStateFeature(state)
+        self.mu = self.getStateFeature(state)
         self.t = 0
     
     def getAction(self, state):
@@ -117,7 +117,7 @@ class ApproximateQLearningAgent(Agent):
 
     def update(self, state, action, nextState, reward):
         """
-        update weights and miu if in estimating mode
+        update weights and mu if in estimating mode
         """
         features = self.getFeatures( state, action )
         correction = reward + self.gamma * self.getValue( nextState ) - self.getQValue( state, action )
@@ -126,7 +126,7 @@ class ApproximateQLearningAgent(Agent):
         else:
             self.weights += self.alpha * correction * features
         if isInEstimating:
-            self.miu += self.getStateFeatrure(self.nextState) * self.gamma ** self.t
+            self.mu += self.getStateFeatrure(self.nextState) * self.gamma ** self.t
       
 
     ##############################
@@ -159,7 +159,7 @@ class ApproximateQLearningAgent(Agent):
             return np.random.choice( bestActions, 1 )[0]
 
     def getfeatureExpection(self):
-        return self.miu
+        return self.mu
 
     # overrid this function 
     def getStateFeature(self, state):

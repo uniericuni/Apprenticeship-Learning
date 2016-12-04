@@ -35,13 +35,8 @@ class inverseLearning:
         mu = np.zeros((self.featureSize, 1))
         for i in range(self.numEstimating):
             self.runGame()
-<<<<<<< HEAD
             mu += self.agent.getfeatureExpection()
         self.mus.append(mu / numEstimating)
-=======
-            miu += self.agent.getfeatureExpectation()
-        self.mius.append(miu / numEstimating)
->>>>>>> 7622421ec4255f9522fe6b322d9d2cfc67214b90
 
     def updateRewardFunction(self):
         if self.muBar = None:

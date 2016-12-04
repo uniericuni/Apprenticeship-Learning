@@ -177,6 +177,9 @@ class ApproximateQLearningAgent(Agent):
     #####################
     # getter and setter #
     #####################
+    def setMode(self, mode):
+        self.mode = mode
+
     def isInEstimating(self):
         return self.mode == AgentMode.estimating
 
@@ -194,6 +197,9 @@ class ApproximateQLearningAgent(Agent):
     
     def setDiscount(self, discount):
         self.gamma = discount
+
+    def setRewardFunction(self, w):
+        self.w = w
     
     def doAction(self,state,action):
         self.lastState = state

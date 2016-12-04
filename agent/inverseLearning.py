@@ -1,15 +1,20 @@
 import numpy as np
+from approximateAgents import *
 
 class inverseLearning:
     """docstring for inverseLearning"""
-    def __init__(self, gamma, numEstimating):
+    def __init__(self, gamma, numEstimating, numTraining):
         self.gamma = gamma
-        self.numEstimating
+        self.numEstimating = numEstimating
+        self.numTraining = numTraining
 
-        self.w = None
+        self.featureSize = 0
+        self.w = np.zeros((self.featureSize,1))
         self.mius = []
         self.miuBar = None
         self.miuExpert = None
+        
+        pass
         
     def train(self):
         self.featureExpection()
@@ -20,13 +25,17 @@ class inverseLearning:
             self.featureExpection()
             t = self.updateRewardFunction()
 
+    # override this function
     def computeExpertExpection(self):
         pass
 
     def featureExpection(self):
+        self.agent.setMode(AgentMode.estimating)
+        miu = np.zeros((self.featureSize, 1))
         for i in range(self.numEstimating):
-
-        pass
+            self.runGame()
+            miu += self.agent.getfeatureExpection()
+        self.mius.append(miu / numEstimating)
 
     def updateRewardFunction(self):
         if self.miuBar = None:
@@ -40,4 +49,11 @@ class inverseLearning:
         return np.linalg.norm(self.w)
         
     def updateAgent(self):
+        self.agent.setMode(AgentMode.training)
+        self.agent.setRewardVector(self.w)
+        for i in range(self.numTraining):
+            self.runGame()
+
+    # override this function
+    def runGame(self):
         pass

@@ -1,13 +1,16 @@
-import pygame
+import pygame, sys
 import game
 import time
 import scipy.io as sio
-from carAgents import *
 from config import *
 
 MAX_ITERATION = 10
 
 if __name__ == '__main__':
+
+    # import agent
+    sys.path.append(AGENT_PATH)
+    from carAgents import *
 
     # game manager init
     counter = 0

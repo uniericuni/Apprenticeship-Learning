@@ -1,8 +1,7 @@
 # an approximate q learning agent
 import numpy as np
-from enum import Enum
 
-class AgentMode(Enum):
+class AgentMode:
     """
     modes of agents
     """

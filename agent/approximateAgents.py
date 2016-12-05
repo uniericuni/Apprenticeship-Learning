@@ -57,7 +57,7 @@ class ApproximateQLearningAgent:
         self.trainAlpha = float(alpha)
         self.gamma = float(gamma)
         self.weights = None
-        self.mode = None
+        self.mode = mode
         self.w = w
         self.t = 0
 
@@ -91,7 +91,6 @@ class ApproximateQLearningAgent:
             self.observeTransition(self.lastState, self.lastAction, state, reward)
 
         legalActions = self.getLegalActions(state)
-        print legalActions
         action = None
         if legalActions.size:
             if np.random.rand(1) < self.epsilon:
@@ -120,6 +119,7 @@ class ApproximateQLearningAgent:
         """
         update weights and mu if in estimating mode
         """
+        print self.mu.T, self.mode
         features = self.getFeatures( state, action )
         correction = reward + self.gamma * self.getValue( nextState ) - self.getQValue( state, action )
         if self.weights == None:
@@ -127,7 +127,7 @@ class ApproximateQLearningAgent:
         else:
             self.weights += self.alpha * correction * features
         if self.isInEstimating():
-            self.mu += self.getStateFeatrure(self.nextState) * self.gamma ** self.t
+            self.mu += self.getStateFeature(nextState) * self.gamma ** self.t
       
 
     ##############################

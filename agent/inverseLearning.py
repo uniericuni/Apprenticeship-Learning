@@ -1,21 +1,19 @@
 import numpy as np
 from approximateAgents import *
 
-class inverseLearning:
+class InverseLearning:
     """docstring for inverseLearning"""
-    def __init__(self, agent, numEstimating, numTraining):
+    def __init__(self, agent, featureSize, error=0.001, numEstimating=100, numTraining=50):
         self.agent = agent
-        self.gamma = agent.getGamma()
+        self.gamma = agent.gamma
         self.numEstimating = numEstimating
         self.numTraining = numTraining
 
-        self.featureSize = 0
+        self.featureSize = featureSize
         self.w = np.zeros((self.featureSize,1))
         self.mus = []
         self.muBar = None
-        self.muExpert = None
-        
-        pass
+
         
     def train(self):
         self.featureExpectation()
@@ -28,6 +26,9 @@ class inverseLearning:
 
     # override this function
     def computeExpertExpectation(self):
+        """
+        compure self.muExpert
+        """
         pass
 
     def featureExpectation(self):
@@ -39,7 +40,7 @@ class inverseLearning:
         self.mus.append(mu / numEstimating)
 
     def updateRewardFunction(self):
-        if self.muBar = None:
+        if self.muBar == None:
             self.muBar = self.mus[0]
             muBar = self.muBar
         else:

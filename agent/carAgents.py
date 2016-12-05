@@ -2,7 +2,7 @@ from approximateAgents import *
 
 class CarAgent(ApproximateQLearningAgent):
     """docstring for CarAgent"""
-    def __init__(self,  w, mode=AgentMode.estimating, alpha=0.2, epsilon=0.05, gamma=0.8):
+    def __init__(self,  w, mode=AgentMode.estimating, alpha=0.2, epsilon=0.05, gamma=0.99):
         ApproximateQLearningAgent.__init__(self, w, mode, alpha, epsilon, gamma)
 
     def getStateFeature(self, state):

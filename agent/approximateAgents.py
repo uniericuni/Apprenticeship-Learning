@@ -209,7 +209,7 @@ class ApproximateQLearningAgent:
     def setDiscount(self, discount):
         self.gamma = discount
 
-    def setRewardFunction(self, w):
+    def setRewardVector(self, w):
         self.w = w
     
     def doAction(self,state,action):

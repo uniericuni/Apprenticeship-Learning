@@ -8,7 +8,11 @@ class CarLearning(InverseLearning):
         self.maxIter = maxIter
         
     def computeExpertExpectation(self):
-        pass
+        m = np.array([0.0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+        self.muExpert = m.copy()
+        print self.gamma, self.maxIter
+        for i in range(self.maxIter):
+            self.muExpert += ( self.gamma ** i ) * m
 
     def runGame(self):
         # game manager init
@@ -34,7 +38,7 @@ class CarLearning(InverseLearning):
 
         # final
         self.agent.final((state,legal_action))
-        print self.agent.mu
+        # print self.agent.mu
 
 
 if __name__ == "__main__":

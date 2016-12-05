@@ -8,7 +8,7 @@ class InverseLearning:
         self.gamma = agent.gamma
         self.numEstimating = numEstimating
         self.numTraining = numTraining
-
+        self.error = error
         self.featureSize = featureSize
         self.w = np.zeros((self.featureSize,1))
         self.mus = []
@@ -23,6 +23,7 @@ class InverseLearning:
             self.updateAgent()
             self.featureExpectation()
             t = self.updateRewardFunction()
+            print t
 
     # override this function
     def computeExpertExpectation(self):
@@ -37,7 +38,7 @@ class InverseLearning:
         for i in range(self.numEstimating):
             self.runGame()
             mu += self.agent.getfeatureExpection()
-        self.mus.append(mu / numEstimating)
+        self.mus.append(mu / self.numEstimating)
 
     def updateRewardFunction(self):
         if self.muBar == None:

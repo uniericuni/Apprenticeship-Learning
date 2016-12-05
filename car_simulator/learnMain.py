@@ -14,5 +14,7 @@ if __name__ == '__main__':
     from carLearning import *
 
     agent = CarAgent(w=np.zeros([15,1]))
-    learn = CarLearning(agent)
-    learn.runGame()
+    learn = CarLearning(agent,maxIter=100,numEstimating=10,numTraining=10)
+    learn.computeExpertExpectation()
+    learn.train()
+    # learn.runGame()

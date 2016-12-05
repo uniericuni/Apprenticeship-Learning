@@ -119,7 +119,7 @@ class ApproximateQLearningAgent:
         """
         update weights and mu if in estimating mode
         """
-        print self.mu.T, self.mode
+        # print self.mu.T, self.mode
         features = self.getFeatures( state, action )
         correction = reward + self.gamma * self.getValue( nextState ) - self.getQValue( state, action )
         if self.weights == None:

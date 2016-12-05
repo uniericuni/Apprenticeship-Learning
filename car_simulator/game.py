@@ -8,7 +8,7 @@ from font import *
 
 OPPONENTCARSPAWN = pygame.USEREVENT+1
 RECORDSIGN = pygame.USEREVENT+2
-TIMEDELTA = 10
+TIMEDELTA = 30
 RECORDSIGNINTERVAL = 5
 
 # game manager object
@@ -202,7 +202,6 @@ class gamemgr:
 
         # feature parser
         legal_action = np.array([0,1,2,3,4])
-        print self.state
         if self.state==100:
             f = np.zeros([5,11]).astype('int')
             f[onLane,0] = 1
@@ -222,8 +221,6 @@ class gamemgr:
         # background
         self.screen.fill(BLACK)
         self.screen.blit(self.background.surface, self.background.rect)
-
-        '''
         for i,rect in enumerate(self.background.roadrects):
             self.screen.blit(self.background.roadsurfaces[i], rect)
 
@@ -241,7 +238,6 @@ class gamemgr:
         # record sign
         if self.record and self.recordsign>0:
             pygame.draw.circle(self.screen, RED, (900,40), 10)
-        '''
 
         # double buffer update
         pygame.display.flip()

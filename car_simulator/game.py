@@ -19,9 +19,15 @@ class gamemgr:
         # random seed
         random.seed() 
 
+        # mode init
+        self.mode = mode
+        self.record = False
+        self.recordsign = RECORDSIGNINTERVAL
+
         # game screen initialization
         pygame.init()
-        self.screen = pygame.display.set_mode((1024,768), DOUBLEBUF)
+        if self.mode!=100:
+            self.screen = pygame.display.set_mode((1024,768), DOUBLEBUF)
 
         # game clock initialization
         self.clock = pygame.time.Clock()
@@ -48,11 +54,6 @@ class gamemgr:
 
         # event message
         self.events = []
-
-        # state init
-        self.mode = mode
-        self.record = False
-        self.recordsign = RECORDSIGNINTERVAL
 
     def input(self, action=None):
 

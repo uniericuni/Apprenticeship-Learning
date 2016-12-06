@@ -30,11 +30,9 @@ class CarLearning(InverseLearning):
             # main game loop
             mode = self.gamemgr.input(action)
             feature,state,legal_action = self.gamemgr.update()
-            self.gamemgr.render()
             counter += 1
 
         # final
-        print state
         self.agent.final((state,legal_action))
         # print self.agent.mu
 

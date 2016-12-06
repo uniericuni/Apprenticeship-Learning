@@ -18,6 +18,11 @@ def main(argv):
 
     # training mode
     if gamemode==100:
+        # pre-run
+        print 'pre-running ...'
+        for i in range(0,100):
+            mode = gamemgr.input()
+            feature,state,legal_action = gamemgr.update()
         agent = CarAgent(w=np.zeros([15,1]))
         learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=10, numTraining=10)
         learn.computeExpertExpectation()
@@ -26,6 +31,7 @@ def main(argv):
     # playing mode
     else:
         # main game loop
+        count = 0
         while gamemgr.mode:
             mode = gamemgr.input()
             feature,state,legal_action = gamemgr.update()

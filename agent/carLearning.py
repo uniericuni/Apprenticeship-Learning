@@ -15,31 +15,28 @@ class CarLearning(InverseLearning):
             self.muExpert += ( self.gamma ** i ) * m
 
     def runGame(self):
-        # game manager init
-        counter = 0
-        gamemgr = game.gamemgr(state=100)
-        status = gamemgr.input()
-        state,legal_action = gamemgr.update()
-
         # agent init
-        self.agent.registerInitialState((state,legal_action))
+        mode = self.gamemgr.input()
+        feature,state,legal_action = self.gamemgr.update()
+        self.agent.registerInitialState((state, legal_action))
+        counter = 0
 
         # main game loop
-        while gamemgr.state and counter<self.maxIter:
+        while mode and counter<self.maxIter:
 
             # action assignment
             action = self.agent.getAction((state,legal_action))
 
             # main game loop
-            status = gamemgr.input(action)
-            state,legal_action = gamemgr.update()
-            # gamemgr.render()
+            mode = self.gamemgr.input(action)
+            feature,state,legal_action = self.gamemgr.update()
+            self.gamemgr.render()
             counter += 1
 
         # final
+        print state
         self.agent.final((state,legal_action))
         # print self.agent.mu
-
 
 if __name__ == "__main__":
     from carAgents import * 

@@ -3,17 +3,17 @@ from approximateAgents import *
 
 class InverseLearning:
     """docstring for inverseLearning"""
-    def __init__(self, agent, featureSize, error=0.001, numEstimating=100, numTraining=50):
+    def __init__(self, agent, gamemgr, eatureSize, error=0.001, numEstimating=100, numTraining=50):
         self.agent = agent
+        self.gamemgr = gamemgr
         self.gamma = agent.gamma
         self.numEstimating = numEstimating
         self.numTraining = numTraining
         self.error = error
-        self.featureSize = featureSize
+        self.featureSize = 15
         self.w = np.zeros((self.featureSize,1))
         self.mus = []
         self.muBar = None
-
         
     def train(self):
         self.featureExpectation()

@@ -3,8 +3,9 @@ from approximateAgents import *
 
 class InverseLearning:
     """docstring for inverseLearning"""
-    def __init__(self, agent, featureSize, error=0.001, numEstimating=100, numTraining=50):
+    def __init__(self, agent, gamemgr, featureSize, error=0.001, numEstimating=100, numTraining=50):
         self.agent = agent
+        self.gamemgr = gamemgr
         self.gamma = agent.gamma
         self.numEstimating = numEstimating
         self.numTraining = numTraining
@@ -13,17 +14,23 @@ class InverseLearning:
         self.w = np.zeros((self.featureSize,1))
         self.mus = []
         self.muBar = None
-
         
     def train(self):
+        print 'training:'
         self.featureExpectation()
         t = self.updateRewardFunction()
-
+        counter = 0
         while t > self.error:
             self.updateAgent()
             self.featureExpectation()
             t = self.updateRewardFunction()
-            print t
+            sys.stdout.write( '\r' )
+            sys.stdout.write( ' ' * 70 )
+            sys.stdout.write( '\r' )
+            sys.stdout.write( ' ' * 39)
+            sys.stdout.write( ' i = {1}, error: {0}'.format(t, counter) )
+            counter += 1
+        print 'training finished'
 
     # override this function
     def computeExpertExpectation(self):
@@ -36,6 +43,7 @@ class InverseLearning:
         self.agent.setMode(AgentMode.estimating)
         mu = np.zeros((self.featureSize, 1))
         for i in range(self.numEstimating):
+            self.printStatus(float(i)/self.numEstimating)
             self.runGame()
             mu += self.agent.getfeatureExpection()
         self.mus.append(mu / self.numEstimating)
@@ -56,8 +64,40 @@ class InverseLearning:
     def updateAgent(self):
         self.agent.setMode(AgentMode.training)
         for i in range(self.numTraining):
+            self.printStatus(float(i)/self.numTraining)
             self.runGame()
 
     # override this function
     def runGame(self):
         pass
+
+
+    def printStatus(self, percent):
+        pl = 27
+        ml = 12
+        sys.stdout.write('\r')
+        sys.stdout.write(' '*(pl+ml))
+        sys.stdout.write('\r')
+        modeStr = ""
+        if self.agent.isInEstimating():
+            modeStr = "Estimating: "
+        if self.agent.isInTraining():
+            modeStr = "Training:   "
+        pStr = self.progressStr(pl,percent)
+        sys.stdout.write(modeStr + pStr)
+        sys.stdout.flush()
+
+
+
+    def progressStr(self, length=27.0, percent=0.0):
+        ret = '['
+        barLength = length-7
+        for i in range(barLength):
+            if float(i) / barLength <= percent:
+                ret += '='
+            else:
+                ret += ' '
+        ret += ']'
+        percentStr = '%s' % str(int(percent*100)).rjust(3)
+        ret = ret + percentStr + '%'
+        return ret

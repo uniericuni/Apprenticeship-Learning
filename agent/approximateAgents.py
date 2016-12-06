@@ -1,5 +1,6 @@
 # an approximate q learning agent
 import numpy as np
+import sys
 
 class AgentMode:
     """
@@ -216,4 +217,3 @@ class ApproximateQLearningAgent:
         self.lastState = state
         self.lastAction = action
         self.t += 1
-

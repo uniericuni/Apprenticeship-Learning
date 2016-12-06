@@ -14,14 +14,20 @@ RECORDSIGNINTERVAL = 5
 # game manager object
 class gamemgr:
 
-    def __init__(self, state=1):
+    def __init__(self, mode=1):
         
         # random seed
         random.seed() 
 
+        # mode init
+        self.mode = mode
+        self.record = False
+        self.recordsign = RECORDSIGNINTERVAL
+
         # game screen initialization
         pygame.init()
-        self.screen = pygame.display.set_mode((1024,768), DOUBLEBUF)
+        if self.mode!=100:
+            self.screen = pygame.display.set_mode((1024,768), DOUBLEBUF)
 
         # game clock initialization
         self.clock = pygame.time.Clock()
@@ -49,11 +55,6 @@ class gamemgr:
         # event message
         self.events = []
 
-        # state init
-        self.state = state
-        self.record = False
-        self.recordsign = RECORDSIGNINTERVAL
-
     def input(self, action=None):
 
         # game clock
@@ -70,11 +71,11 @@ class gamemgr:
             # input event
             elif event.type==KEYDOWN:
                 if not hasattr(event, 'key'): continue
-                elif event.key==K_ESCAPE: self.state = 0
+                elif event.key==K_ESCAPE: self.mode = 0
                 elif event.key==K_SPACE:
-                    if self.state==1: self.state = 2
-                    elif self.state==2: self.state = 3
-                    elif self.state==3: self.state = 1
+                    if self.mode==1: self.mode = 2
+                    elif self.mode==2: self.mode = 3
+                    elif self.mode==3: self.mode = 1
                 elif event.key==K_r: self.record = not self.record
                 else: 
                     self.events.append(event.key)
@@ -83,7 +84,7 @@ class gamemgr:
                 if event.key in self.events: self.events.remove(event.key)
 
         # training mode
-        if self.state==100:
+        if self.mode==100:
             if action==1: self.events.append(pygame.K_a)
             elif action==2: self.events.append(pygame.K_s)
             elif action==3: self.events.append(pygame.K_d)
@@ -91,7 +92,7 @@ class gamemgr:
             elif action==5: self.events.append(pygame.K_g)
 
         # return game state
-        return self.state
+        return self.mode
 
     def update(self):
 
@@ -131,7 +132,7 @@ class gamemgr:
         if RECORDSIGN in self.events: self.events.remove(RECORDSIGN)
 
         # update main character status: state 1
-        if self.state==1:
+        if self.mode==1:
             self.objects[0].accelerate([xacc,yacc])
 
         # update main character status: state 2
@@ -183,7 +184,7 @@ class gamemgr:
         qdist[np.where(dist<-449)]=-5
         qdist = qdist.astype('int')
             
-        self.status.update( "game mode: %d"%self.state )
+        self.status.update( "game mode: %d"%self.mode )
         self.status.update( "position: %d,%d"%( pos[0], pos[1] ))
         self.status.update( "speed: %d,%d"%( spd[0], spd[1] ))
         self.status.update( "lane: %d"%onLane )
@@ -201,20 +202,18 @@ class gamemgr:
             collider.load( IMAGE_PATH+'hit_car.png' )
 
         # feature parser
+        feature = None
         legal_action = np.array([0,1,2,3,4])
-        if self.state==100:
-            f = np.zeros([5,11]).astype('int')
-            f[onLane,0] = 1
-            for i in range(0,5):
-                f[i,qdist[i]+6] = 1
-            return f,legal_action
-        elif self.record:
-            f = [0]*15
-            f[onLane] = 1
-            f[qdist[onLane]+10] = 1
-            return f,legal_action
-        else:
-            return None,legal_action
+        state = np.zeros([5,11]).astype('int')
+        state[onLane,0] = 1
+        for i in range(0,5):
+            state[i,qdist[i]+6] = 1
+        if self.record:
+            feature = [0]*15
+            feature[onLane] = 1
+            feature[qdist[onLane]+10] = 1
+
+        return feature,state,legal_action
 
     def render(self):
 

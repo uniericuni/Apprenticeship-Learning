@@ -32,6 +32,11 @@ class InverseLearning:
             counter += 1
         print 'training finished'
 
+    def test():
+        print "testing:"
+        self.agent.setMode(AgentMode.testing)
+        self.runGame()
+
     # override this function
     def computeExpertExpectation(self):
         """

@@ -84,7 +84,7 @@ class gamemgr:
                 if event.key in self.events: self.events.remove(event.key)
 
         # training mode
-        if self.mode==100:
+        if self.mode==100 or 3:
             if action==1: self.events.append(pygame.K_a)
             elif action==2: self.events.append(pygame.K_s)
             elif action==3: self.events.append(pygame.K_d)

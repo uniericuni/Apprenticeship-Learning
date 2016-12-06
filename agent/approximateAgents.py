@@ -1,5 +1,6 @@
 # an approximate q learning agent
 import numpy as np
+import scipy.io as sio
 import sys
 
 class AgentMode:
@@ -217,3 +218,12 @@ class ApproximateQLearningAgent:
         self.lastState = state
         self.lastAction = action
         self.t += 1
+
+
+    def savePolicy(self, filename):
+        sio.savemat(filename, {'weights':self.weights, 'w':self.w})
+
+    def loadPolicy(self, filename):
+        m = loadmat(filename)
+        self.weights = m['weights']
+        self.w = m['w']

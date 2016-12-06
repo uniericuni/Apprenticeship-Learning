@@ -1,7 +1,8 @@
 # an approximate q learning agent
 import numpy as np
+import sys
 
-class AgentMode(Enum):
+class AgentMode:
     """
     modes of agents
     """
@@ -10,7 +11,7 @@ class AgentMode(Enum):
     testing = 3
         
 
-class ApproximateQLearningAgent(Agent):
+class ApproximateQLearningAgent:
     """
     Abstract class of approximate q-learning agent.
     Must override 
@@ -28,7 +29,7 @@ class ApproximateQLearningAgent(Agent):
         w               reward vector
         t               time
         weights         approximate q table weights
-        miu             expection of features
+        mu              expection of features
         lastState       previous state
         lastAction      previous action
 
@@ -44,13 +45,20 @@ class ApproximateQLearningAgent(Agent):
 
         getScore(self, state): return reward based on state
         getQValue(self, state, action): get q value
+
+
+    Ussage:
+        To run a game
+        1. initialize agent
+        2. 
+
     """
-    def __init__(self, alpha=0.2, epsilon=0.05, gamma=0.8, w):
+    def __init__(self, w, mode=AgentMode.estimating, alpha=0.2, epsilon=0.05, gamma=0.8):
         self.trainEpsilon = float(epsilon)
         self.trainAlpha = float(alpha)
         self.gamma = float(gamma)
         self.weights = None
-        self.mode = None
+        self.mode = mode
         self.w = w
         self.t = 0
 
@@ -71,7 +79,7 @@ class ApproximateQLearningAgent(Agent):
         self.lastState = None
         self.lastAction = None
         self.episodeRewards = 0.0
-        self.miu = self.getStateFeature(state)
+        self.mu = self.getStateFeature(state)
         self.t = 0
     
     def getAction(self, state):
@@ -85,7 +93,7 @@ class ApproximateQLearningAgent(Agent):
 
         legalActions = self.getLegalActions(state)
         action = None
-        if legalActions:
+        if legalActions.size:
             if np.random.rand(1) < self.epsilon:
                 action = np.random.choice( legalActions, 1 )[0]
             else:
@@ -110,26 +118,27 @@ class ApproximateQLearningAgent(Agent):
 
     def update(self, state, action, nextState, reward):
         """
-        update weights and miu if in estimating mode
+        update weights and mu if in estimating mode
         """
+        # print self.mu.T, self.mode
         features = self.getFeatures( state, action )
         correction = reward + self.gamma * self.getValue( nextState ) - self.getQValue( state, action )
-        if not self.weights:
+        if self.weights == None:
             self.weights = self.alpha * correction * features
         else:
             self.weights += self.alpha * correction * features
-        if isInEstimating:
-            self.miu += self.getStateFeatrure(self.nextState) * self.gamma ** self.t
+        if self.isInEstimating():
+            self.mu += self.getStateFeature(nextState) * self.gamma ** self.t
       
 
     ##############################
     # getter for learning values #
     ##############################
     def getScore(self, state):
-        return self.w.T.dot(seelf.getStateFeature(state))
+        return self.w.T.dot(self.getStateFeature(state))
 
     def getQValue(self, state, action):
-        if self.weights
+        if self.weights != None:
             features = self.getFeatures(state, action)
             return self.weights.T.dot(features)
         else:
@@ -137,14 +146,14 @@ class ApproximateQLearningAgent(Agent):
   
     def getValue(self, state):
         actions = self.getLegalActions( state )
-        if not actions:
+        if not actions.size:
             return 0.0
         else:
             return max( [ self.getQValue( state, action ) for action in actions ] )
     
     def getPolicy(self, state):
         actions = self.getLegalActions( state )
-        if not actions:
+        if not actions.size:
             return None
         else:
             maxQ = self.getValue( state )
@@ -152,28 +161,28 @@ class ApproximateQLearningAgent(Agent):
             return np.random.choice( bestActions, 1 )[0]
 
     def getfeatureExpection(self):
-        return self.miu
+        return self.mu
 
     # overrid this function 
     def getStateFeature(self, state):
-    """
-    return features base on state
-    """
+        """
+        return features base on state
+        """
         pass
 
     # overrid this function 
     def getFeatures(self, state, action):
-    """
-    return features base on state and action
-    """
+        """
+        return features base on state and action
+        """
         pass
 
     # overrid this function 
     def getLegalActions(self, state):
-    """
-    return legal actions.
-    if no actions return None
-    """
+        """
+        return legal actions.
+        if no actions return None
+        """
         pass
 
 
@@ -201,11 +210,10 @@ class ApproximateQLearningAgent(Agent):
     def setDiscount(self, discount):
         self.gamma = discount
 
-    def setRewardFunction(self, w):
+    def setRewardVector(self, w):
         self.w = w
     
     def doAction(self,state,action):
         self.lastState = state
         self.lastAction = action
         self.t += 1
-

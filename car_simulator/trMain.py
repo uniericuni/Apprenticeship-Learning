@@ -1,35 +1,53 @@
-import pygame
-import game
-import time
+import pygame, sys, time
 import scipy.io as sio
+import game
+from parser import parser
 from config import *
 
-if __name__ == '__main__':
+# main
+def main(argv):
+
+    # command parser
+    gamemode,MAX_ITERATION = parser(argv)
 
     # game manager init
-    gamemgr = game.gamemgr(state=100)
     features = []
+    gamemgr = game.gamemgr(mode=gamemode)
+    mode = gamemgr.input()
+    feature,state,legal_action = gamemgr.update()
 
-    # main game loop
-    while gamemgr.state:
+    # training mode
+    if gamemode==100:
+        agent = CarAgent(w=np.zeros([15,1]))
+        learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=10, numTraining=10)
+        learn.computeExpertExpectation()
+        learn.train()
 
-        # action assignment
-        action = 4
-
+    # playing mode
+    else:
         # main game loop
-        status = gamemgr.input(action)
-        feature,legal_action = gamemgr.update()
-        gamemgr.render()
+        while gamemgr.mode:
+            mode = gamemgr.input()
+            feature,state,legal_action = gamemgr.update()
+            gamemgr.render()
 
-        # feature export
-        if gamemgr.record:
-            features.append(feature)
-        elif len(features)>0:
-            timestr = time.strftime('%y%m%d%H%M%S')
-            sio.savemat('%s%s_record.mat'%(CAR_RECORD_PATH,timestr), {'features':features})
-            features = []
+            # feature export
+            if gamemgr.record:
+                features.append(feature)
+            elif len(features)>0:
+                timestr = time.strftime('%y%m%d%H%M%S')
+                sio.savemat('%s%s_record.mat'%(CAR_RECORD_PATH,timestr), {'features':features})
+                features = []
 
     # feature export
     if len(features)>0:
         timestr = time.strftime('%y%m%d%H%M%S')
         sio.savemat('%s%s_record.mat'%(CAR_RECORD_PATH,timestr), {'features':features})
+
+# main
+if __name__ == '__main__':
+    # import agent
+    sys.path.append(AGENT_PATH)
+    from carAgents import *
+    from carLearning import *
+    main(sys.argv[1:])

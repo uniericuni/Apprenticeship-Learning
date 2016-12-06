@@ -27,6 +27,8 @@ def main(argv):
         learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=10, numTraining=10)
         learn.computeExpertExpectation()
         learn.train()
+        gamemgr.mode=3
+        learn.test()
 
     # playing mode
     else:

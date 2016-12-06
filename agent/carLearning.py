@@ -33,7 +33,7 @@ class CarLearning(InverseLearning):
             # main game loop
             status = gamemgr.input(action)
             state,legal_action = gamemgr.update()
-            # gamemgr.render()
+            gamemgr.render()
             counter += 1
 
         # final

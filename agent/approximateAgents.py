@@ -224,6 +224,6 @@ class ApproximateQLearningAgent:
         sio.savemat(filename, {'weights':self.weights, 'w':self.w})
 
     def loadPolicy(self, filename):
-        m = loadmat(filename)
+        m = sio.loadmat(filename)
         self.weights = m['weights']
         self.w = m['w']

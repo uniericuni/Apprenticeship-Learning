@@ -36,7 +36,7 @@ class InverseLearning:
     def test(self):
         print "testing:"
         self.agent.setMode(AgentMode.testing)
-        self.runGame()
+        self.runTest()
 
     # override this function
     def computeExpertExpectation(self):

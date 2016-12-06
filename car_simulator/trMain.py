@@ -19,9 +19,11 @@ def main(argv):
     # training mode
     if gamemode==100:
         agent = CarAgent(w=np.zeros([15,1]))
-        learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=10, numTraining=10)
+        learn = CarLearning( agent=agent, gamemgr=gamemgr, maxIter=MAX_ITERATION, numEstimating=10, numTraining=1,numRLTraining=10)
         learn.computeExpertExpectation()
         learn.train()
+        gamemgr.mode=3
+        learn.test()
 
     # playing mode
     else:

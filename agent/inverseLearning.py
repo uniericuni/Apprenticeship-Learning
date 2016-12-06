@@ -3,12 +3,13 @@ from approximateAgents import *
 
 class InverseLearning:
     """docstring for inverseLearning"""
-    def __init__(self, agent, gamemgr, featureSize, error=0.001, numEstimating=100, numTraining=50):
+    def __init__(self, agent, gamemgr, featureSize, error=0.001, numEstimating=100, numTraining=-1, numRLTraining=50):
         self.agent = agent
         self.gamemgr = gamemgr
         self.gamma = agent.gamma
         self.numEstimating = numEstimating
         self.numTraining = numTraining
+        self.numRLTraining = numRLTraining
         self.error = error
         self.featureSize = featureSize
         self.w = np.zeros((self.featureSize,1))
@@ -20,7 +21,7 @@ class InverseLearning:
         self.featureExpectation()
         t = self.updateRewardFunction()
         counter = 0
-        while t > self.error:
+        while t > self.error and ( self.numTraining < 0 or counter < self.numTraining ):
             self.updateAgent()
             self.featureExpectation()
             t = self.updateRewardFunction()
@@ -32,7 +33,7 @@ class InverseLearning:
             counter += 1
         print 'training finished'
 
-    def test():
+    def test(self):
         print "testing:"
         self.agent.setMode(AgentMode.testing)
         self.runGame()
@@ -68,8 +69,8 @@ class InverseLearning:
         
     def updateAgent(self):
         self.agent.setMode(AgentMode.training)
-        for i in range(self.numTraining):
-            self.printStatus(float(i)/self.numTraining)
+        for i in range(self.numRLTraining):
+            self.printStatus(float(i)/self.numRLTraining)
             self.runGame()
 
     # override this function

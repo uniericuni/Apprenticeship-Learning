@@ -4,9 +4,9 @@ import scipy.io as sio
 
 class CarLearning(InverseLearning):
     """docstring for CarLearning"""
-    def __init__(self, agent, gamemgr, featureSize=15, maxIter=1000, error=0.001, numEstimating=1000, numTraining=50):
+    def __init__(self, agent, gamemgr, featureSize=15, maxIter=1000, error=0.001, numEstimating=1000, numTraining=-1, numRLTraining=50):
         # print featureSize, maxIter, error, numEstimating, numTraining
-        InverseLearning.__init__(self, agent=agent, gamemgr=gamemgr, featureSize=featureSize, error=error, numEstimating=numEstimating, numTraining=numTraining)
+        InverseLearning.__init__(self, agent=agent, gamemgr=gamemgr, featureSize=featureSize, error=error, numEstimating=numEstimating, numTraining=numTraining, numRLTraining=numRLTraining)
         self.maxIter = maxIter
         
     def computeExpertExpectation(self):

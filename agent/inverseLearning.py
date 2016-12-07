@@ -55,7 +55,7 @@ class InverseLearning:
         self.mus.append(mu / self.numEstimating)
 
     def updateRewardFunction(self):
-        if self.muBar == None:
+        if self.muBar is None:
             self.muBar = self.mus[0]
             muBar = self.muBar
         else:

@@ -124,7 +124,7 @@ class ApproximateQLearningAgent:
         # print self.mu.T, self.mode
         features = self.getFeatures( state, action )
         correction = reward + self.gamma * self.getValue( nextState ) - self.getQValue( state, action )
-        if self.weights == None:
+        if self.weights is None:
             self.weights = self.alpha * correction * features
         else:
             self.weights += self.alpha * correction * features
@@ -139,7 +139,7 @@ class ApproximateQLearningAgent:
         return self.w.T.dot(self.getStateFeature(state))
 
     def getQValue(self, state, action):
-        if self.weights != None:
+        if not self.weights is None:
             features = self.getFeatures(state, action)
             return self.weights.T.dot(features)
         else:

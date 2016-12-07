@@ -27,27 +27,6 @@ class CarLearning(InverseLearning):
         self.muExpert = self.muExpert / counter
         # print self.muExpert.T
 
-    def runTest(self):
-        # agent init
-        mode = self.gamemgr.input()
-        feature,state,legal_action = self.gamemgr.update()
-        self.agent.registerInitialState((state, legal_action))
-
-        # main game loop
-        while mode:
-
-            # action assignment
-            action = self.agent.getAction((state,legal_action))
-
-            # main game loop
-            mode = self.gamemgr.input(action)
-            feature,state,legal_action = self.gamemgr.update()
-            self.gamemgr.render()
-
-        # final
-        self.agent.final((state,legal_action))
-        # print self.agent.mu
-
     def runGame(self):
         # agent init
         mode = self.gamemgr.input()
@@ -64,7 +43,6 @@ class CarLearning(InverseLearning):
             # main game loop
             mode = self.gamemgr.input(action)
             feature,state,legal_action = self.gamemgr.update()
-            print self.agent.isInTesting()
             if self.agent.isInTesting():
                 self.gamemgr.render()
             counter += 1

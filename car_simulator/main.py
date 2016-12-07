@@ -31,7 +31,7 @@ def main(argv):
         # learn.agent.savePolicy('policy.mat')
 
     # auto mode
-    if gamemode==3:
+    elif gamemode==3:
         # pre-run
         print 'pre-running ...'
         for i in range(0,100):

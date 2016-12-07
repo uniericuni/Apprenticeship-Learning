@@ -8,6 +8,7 @@ from font import *
 
 OPPONENTCARSPAWN = pygame.USEREVENT+1
 RECORDSIGN = pygame.USEREVENT+2
+OPPONENT_CLOCK = 80
 TIMEDELTA = 30
 RECORDSIGNINTERVAL = 5
 
@@ -31,7 +32,7 @@ class gamemgr:
 
         # game clock initialization
         self.clock = pygame.time.Clock()
-        pygame.time.set_timer(OPPONENTCARSPAWN, TIMEDELTA*100)
+        self.opponent_counter = 0
         pygame.time.set_timer(RECORDSIGN, TIMEDELTA*25)
 
         # object queue initialization
@@ -58,13 +59,12 @@ class gamemgr:
     def input(self, action=None):
 
         # game clock
-        self.clock.tick(TIMEDELTA)
+        if self.mode!=100:
+            self.clock.tick(TIMEDELTA)
 
         # events handling
         for event in pygame.event.get(): 
             # timer event 
-            if event.type==OPPONENTCARSPAWN:
-                self.events.append(OPPONENTCARSPAWN)
             if event.type==RECORDSIGN:
                 self.events.append(RECORDSIGN)
 
@@ -102,6 +102,10 @@ class gamemgr:
         lane = 0
         lanenum = 0
         self.recordsign -= 1
+        self.opponent_counter += 1 
+        if self.opponent_counter%OPPONENT_CLOCK==0:
+            opponent_counter = 0
+            self.events.append(OPPONENTCARSPAWN)
         for key in self.events:
             if key==OPPONENTCARSPAWN:
                 l = random.randint(1,self.background.lanenum-2)

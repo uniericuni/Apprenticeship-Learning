@@ -55,6 +55,7 @@ class gamemgr:
 
         # event message
         self.events = []
+        self.action = None
 
     def input(self, action=None):
 
@@ -83,13 +84,25 @@ class gamemgr:
                 if not hasattr(event, 'key'): continue
                 if event.key in self.events: self.events.remove(event.key)
 
-        # training mode
+        # autodriving mode
         if self.mode==100 or 3:
-            if action==1: self.events.append(pygame.K_a)
-            elif action==2: self.events.append(pygame.K_s)
-            elif action==3: self.events.append(pygame.K_d)
-            elif action==4: self.events.append(pygame.K_f)
-            elif action==5: self.events.append(pygame.K_g)
+            if action==1:
+                self.events.append(pygame.K_a)
+                self.action = pygame.K_a
+            elif action==2:
+                self.events.append(pygame.K_s)
+                self.action = pygame.K_s
+            elif action==3:
+                self.events.append(pygame.K_d)
+                self.action = pygame.K_d
+            elif action==4:
+                self.events.append(pygame.K_f)
+                self.action = pygame.K_f
+            elif action==5:
+                self.events.append(pygame.K_g)
+                self.action = pygame.K_g
+            # print action
+            # print self.events
 
         # return game state
         return self.mode
@@ -130,10 +143,11 @@ class gamemgr:
             if key==pygame.K_g: lane = 5
             if key==pygame.K_h: lane = 6
             if key==pygame.K_j: lane = 7
-
-        # update timer
+        
+        # update timer & action
         if OPPONENTCARSPAWN in self.events: self.events.remove(OPPONENTCARSPAWN)
         if RECORDSIGN in self.events: self.events.remove(RECORDSIGN)
+        if (self.mode==100 or 3) and self.action in self.events: self.events.remove(self.action)
 
         # update main character status: state 1
         if self.mode==1:

@@ -33,6 +33,7 @@ class DaPingTai(object):
         self.ground_r = np.array([self.setNegativeReward(s) for s in range(self.n_states)])
         self.positiveState = self.setPostiveRewardState(self.ground_r)
         self.startState = self.setStartState(self.ground_r)
+        self.currentState = self.startState
 
 
 
@@ -58,20 +59,6 @@ class DaPingTai(object):
         -> Feature vector.
         """
 
-        if feature_map == "coord":
-            f = np.zeros(self.grid_size)
-            x, y = i % self.grid_size, i // self.grid_size
-            f[x] += 1
-            f[y] += 1
-            return f
-        if feature_map == "proxi":
-            f = np.zeros(self.n_states)
-            x, y = i % self.grid_size, i // self.grid_size
-            for b in range(self.grid_size):
-                for a in range(self.grid_size):
-                    dist = abs(x - a) + abs(y - b)
-                    f[self.point_to_int((a, b))] = dist
-            return f
         # Assume identity map.
         f = np.zeros(self.n_states)
         f[i] = 1
@@ -119,6 +106,26 @@ class DaPingTai(object):
         """
 
         return abs(i[0] - k[0]) + abs(i[1] - k[1]) <= 1
+
+    def getLegalAction(self, state):
+        sx, sy = self.int_to_point(state)
+        flag = np.zeros((4,))
+        if sx == 0:
+            flag[1] = 1      
+        if sx == len(self.grid_size) - 1:
+            flag[3] = 1
+        if sy == 0:
+            flag[2] = 1
+        if sy == len(self.grid_size) - 1:
+            flag[0] = 1
+
+        return list(np.where(flag == 0)[0])
+
+
+
+
+
+
 
     def _transition_probability(self, i, j, k):
         """
@@ -189,6 +196,9 @@ class DaPingTai(object):
 
         return np.random.choice(points[ground_r_copy == 0])
 
+    def getAction(self, action):
+        return self.action[action]
+
     def getPostiveRewardState(self):
         """
         Return postive rewards state
@@ -222,6 +232,14 @@ class DaPingTai(object):
         """
 
         return self.startState
+
+    def getCurrentState(self):
+
+        return self.currentState
+
+    def setCurrentState(self, currentState):
+
+        self.currentState = currentState
 
     def convertToMatrix(self, ground_r):
         """

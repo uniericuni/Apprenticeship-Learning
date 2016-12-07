@@ -33,6 +33,8 @@ class CarLearning(InverseLearning):
         feature,state,legal_action = self.gamemgr.update()
         self.agent.registerInitialState((state, legal_action))
         counter = 0
+        # print state
+        # print legal_action
 
         # main game loop
         while mode and ( self.agent.isInTesting() or counter<self.maxIter ):

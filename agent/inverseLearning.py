@@ -53,6 +53,7 @@ class InverseLearning:
             self.runGame()
             mu += self.agent.getfeatureExpection()
         self.mus.append(mu / self.numEstimating)
+        print len(self.mus), self.mus[-1].shape
 
     def updateRewardFunction(self):
         if self.muBar is None:

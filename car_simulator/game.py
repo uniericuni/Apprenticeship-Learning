@@ -183,7 +183,7 @@ class gamemgr:
             l = obj.lane
             if abs(dist[l]) > abs(main.position[1]-obj.position[1]):
                     dist[l] = main.position[1]-obj.position[1]
-        qdist = (dist+450)/100-5
+        qdist = (dist-50)/100+0.5
         qdist[np.where(dist>=350)]=4
         qdist[np.where(dist<-449)]=-5
         qdist = qdist.astype('int')

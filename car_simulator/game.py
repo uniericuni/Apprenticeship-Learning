@@ -199,7 +199,10 @@ class gamemgr:
         self.background.update()
 
         # remove redundant objects
-        for id in removeid: self.objects.pop(id)
+        for id in removeid:
+            obj = self.objects[id]
+            self.objects.pop(id)
+            del obj
         
         # collision cars
         for collider in self.collideds:

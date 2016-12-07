@@ -28,7 +28,7 @@ def main(argv):
         # learn.agent.loadPolicy('policy.mat')
         learn.computeExpertExpectation()
         learn.train()
-        # learn.agent.savePolicy('policy.mat')
+        learn.agent.savePolicy('policy.mat')
 
     # auto mode
     elif gamemode==3:

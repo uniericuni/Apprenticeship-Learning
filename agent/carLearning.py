@@ -56,7 +56,7 @@ class CarLearning(InverseLearning):
         counter = 0
 
         # main game loop
-        while mode and counter<self.maxIter:
+        while mode and ( self.agent.isInTesting() or counter<self.maxIter ):
 
             # action assignment
             action = self.agent.getAction((state,legal_action))
@@ -64,6 +64,9 @@ class CarLearning(InverseLearning):
             # main game loop
             mode = self.gamemgr.input(action)
             feature,state,legal_action = self.gamemgr.update()
+            print self.agent.isInTesting()
+            if self.agent.isInTesting():
+                self.gamemgr.render()
             counter += 1
 
         # final

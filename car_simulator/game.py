@@ -5,6 +5,7 @@ from config import *
 from car import *
 from background import *
 from font import *
+from guppy import hpy
 
 OPPONENTCARSPAWN = pygame.USEREVENT+1
 RECORDSIGN = pygame.USEREVENT+2

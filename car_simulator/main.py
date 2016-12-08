@@ -19,7 +19,7 @@ def main(argv):
     # training mode
     if gamemode==100:
         # pre-run
-        print 'pre-running ...'
+        sys.stdout.write('pre-running ...'+'\n')
         for i in range(0,100):
             mode = gamemgr.input()
             feature,state,legal_action = gamemgr.update()
@@ -33,7 +33,7 @@ def main(argv):
     # auto mode
     elif gamemode==3:
         # pre-run
-        print 'pre-running ...'
+        sys.stdout.write('pre-running ...'+'\n')
         for i in range(0,100):
             mode = gamemgr.input()
             feature,state,legal_action = gamemgr.update()

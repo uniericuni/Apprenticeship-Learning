@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 from approximateAgents import *
 
 class InverseLearning:
@@ -17,7 +18,7 @@ class InverseLearning:
         self.muBar = None
         
     def train(self):
-        print 'training:'
+        sys.stdout.write('training:'+'\n')
         self.featureExpectation()
         t = self.updateRewardFunction()
         counter = 0
@@ -31,10 +32,10 @@ class InverseLearning:
             sys.stdout.write( ' ' * 39)
             sys.stdout.write( ' i = {1}, error: {0}'.format(t, counter) )
             counter += 1
-        print 'training finished'
+        sys.stdout.write('training finished'+'\n')
 
     def test(self):
-        print "testing:"
+        sys.stdout.write('testing:'+'\n')
         self.agent.setMode(AgentMode.testing)
         self.runGame()
 
@@ -53,7 +54,8 @@ class InverseLearning:
             self.runGame()
             mu += self.agent.getfeatureExpection()
         self.mus.append(mu / self.numEstimating)
-        print len(self.mus), self.mus[-1].shape
+        out = str(len(self.mus))+str(self.mus[-1].shape)
+        sys.stdout.write(out+'\n')
 
     def updateRewardFunction(self):
         if self.muBar is None:

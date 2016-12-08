@@ -8,7 +8,7 @@ def parser(argv):
     try:
         opts, args = getopt.getopt(argv,"m:i:")
     except getopt.GetoptError:
-        print 'usage: main.py [-m gamemode][-i max_iteration]'
+        sys.stdout.write('usage: main.py [-m gamemode][-i max_iteration]'+'\n')
         sys.exit(2)
 
     # parameter parsing
@@ -25,7 +25,7 @@ def parser(argv):
             elif arg=='auto':
                 gamemode = 3
             else:
-                print 'usage: -m [train|drive|auto]'
+                sys.stdout.write('usage: -m [train|drive|auto]'+'\n')
                 sys.exit(2)
 
         # max_iteration
@@ -34,16 +34,16 @@ def parser(argv):
                 arg = int(arg)
                 MAX_ITERATION = arg
             except ValueError:
-                print 'usage: -i max_iteration(integer)'
+                sys.stdout.write('usage: -i max_iteration(integer)'+'\n')
                 sys.exit(2)
 
         # exception
         else: 
-            print 'usage: main.py [-m gamemode][-i max_iteration]'
+            sys.stdout.write('usage: main.py [-m gamemode][-i max_iteration]'+'\n')
             sys.exit(2)
 
     # system log
-    print 'gamemode: %d' %gamemode
-    print 'max iteration: %d' %MAX_ITERATION
+    sys.stdout.write('gamemode: %d'%gamemode+'\n')
+    sys.stdout.write('max iteration: %d'%MAX_ITERATION+'\n')
 
     return gamemode,MAX_ITERATION

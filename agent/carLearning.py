@@ -19,7 +19,7 @@ class CarLearning(InverseLearning):
         f = sio.loadmat('../assets/car_records/161208020225_record.mat')['features']
         self.muExpert = np.zeros((self.featureSize,1))
         counter = 0
-        for i in range(1,f.shape[0]-self.maxIter,self.maxIter/2):
+        for i in range(1,f.shape[0]-self.maxIter,self.maxIter//2):
             counter += 1
             for j in range(self.maxIter):
                 self.muExpert += ( self.gamma ** j ) * f[i+j-1:i+j].T

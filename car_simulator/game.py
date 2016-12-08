@@ -110,6 +110,7 @@ class gamemgr:
     def update(self):
 
         # update message handling
+        self.status.clear()
         yacc = 0
         xacc = 0
         lane = 0
@@ -253,7 +254,6 @@ class gamemgr:
             self.screen.blit(text[0], text[1])
         for text in self.status.texts:
             self.screen.blit(text[0], text[1])
-        self.status.clear()
 
         # record sign
         if self.record and self.recordsign>0:

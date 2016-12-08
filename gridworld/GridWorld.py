@@ -269,11 +269,10 @@ class DaPingTai(object):
         # Return the average reward and standard deviation.
         return total_reward.mean(), total_reward.std()
 
-    def generatemaze(self, ground_r):
+    def generatemaze(self, ground_r, startState):
         """
         Generate the maze for BFS
         """
-        startState = self.getStartState()
         sx, sy = self.int_to_point(startState)
 
         goalState = self.getPostiveRewardState()
@@ -311,11 +310,11 @@ class DaPingTai(object):
         graph = {(i, j): [] for j in range(width) for i in range(height) if not maze[i][j]}
         for row, col in graph.keys():
             if row < height - 1 and not maze[row + 1][col]:
-                graph[(row, col)].append(("S", (row + 1, col)))
-                graph[(row + 1, col)].append(("N", (row, col)))
+                graph[(row, col)].append(((0, -1), (row + 1, col)))
+                graph[(row + 1, col)].append(((0, 1), (row, col)))
             if col < width - 1 and not maze[row][col + 1]:
-                graph[(row, col)].append(("E", (row, col + 1)))
-                graph[(row, col + 1)].append(("W", (row, col)))
+                graph[(row, col)].append(((1, 0), (row, col + 1)))
+                graph[(row, col + 1)].append(((-1, 0), (row, col)))
         return graph
 
     def find_path_bfs(self, maze, ms, mg):
@@ -336,6 +335,32 @@ class DaPingTai(object):
             for direction, neighbour in graph[current]:
                 queue.append((path + direction, neighbour))
         return "NO WAY!"
+
+
+    def optimalPolicy(self, gamma):
+        matrix_ground_r = self.convertToMatrix(self.ground_r)
+        phi_sum = 0
+
+ 
+        for state in range((self.n_states)):
+            maze, ms, mg = generatemaze(self.ground_r, state)
+            next_state = ms
+            phi = np.zeros(self.n_states)
+            path = self.find_path_bfs(maze, ms, mg)
+
+            for t, step in enumerate(path):
+                next_state[0] = ms[0] + step[0]
+                next_state[1] = ms[1] + step[1]
+                phi = phi + (gamma ** t) * self.feature_vector(self.int_to_point(next_state))
+
+            phi_sum = phi_sum + phi
+
+
+
+        return phi_sum / self.n_states
+
+
+
 
 
     def generate_trajectories(self, n_trajectories, trajectory_length, policy,

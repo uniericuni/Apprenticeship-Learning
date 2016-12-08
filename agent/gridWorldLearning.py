@@ -7,28 +7,45 @@ class gridWorldLearning(InverseLearning):
 		InverseLearning.__init__(self, agent=agent, gamemgr=DaPingTai, featureSize=featureSize, error=error, numEstimating=numEstimating, numTraining=numTraining, numRLTraining=numRLTraining)
 
 	def computeExpertExpectation(self):
-		pass
+		return self.gamemgr.optimalPolicy(self.gamma)
+
 
 	def runGame(self):
 		#startState = self.gamemgr.getStartState()
-		currentState = self.gamemgr.getCurrentState()
-		cx, cy = self.gamemgr.point_to_int(currentState)
+		currentState = self.gamemgr.getStartState()
+		cx, cy = self.gamemgr.int_to_point(currentState)
 
 		self.agent.registerInitialState(currentState)
+		count = 0
+
+		while True:
 		
-		p = np.random.uniform(0, 1)
+			p = np.random.uniform(0, 1)
 
-		if  p > self.gamemgr.wind:		
+			if  p > self.gamemgr.wind:		
 
-			action = self.agent.getAction(currentState)
-			ax, ay = self.gamemgr.getAction(action)
+				action = self.agent.getAction(currentState) # Specific action
+				ax, ay = self.gamemgr.getAction(action)     # Action to tuple
 
-		else:
-			ax, ay = self.gamemgr.getAction(np.random.randint(0, 4))
+			else:
+				ax, ay = self.gamemgr.getAction(np.random.randint(0, 4))
+			if cx + ax < 0 or cx + ax >= self.gamemgr.grid_size or cy + ay < 0 or cy + ay >= self.gamemgr.grid_size:
+				print('Out of Grid!')
+				break
 
-		currentState = self.gamemgr.point_to_int((cx + ax, cy + ay))
+			self.gamemgr.setCurrentState(self.gamemgr.point_to_int((cx + ax, cy + ay)))
+			#new_state = self.gamemgr.getCurrentState()
+			if self.gamemgr.ground_r[cx + ax, cy + ay] == 1:
+				print('Good!')
+				break
+			count += 1
 
-		self.gamemgr.setCurrentState(currentState)
+		
+
+
+
+
+
 
 
 

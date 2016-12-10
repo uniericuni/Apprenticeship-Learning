@@ -23,7 +23,7 @@ class DaPingTai(object):
         -> Gridworld
         """
 
-        self.actions = ((1, 0), (0, 1), (-1, 0), (0, -1))
+        self.actions = ((1, 0), (0, 1), (-1, 0), (0, -1))    #down,right, up, left
         self.n_actions = len(self.actions)
         self.n_states = grid_size ** 2
         self.grid_size = grid_size
@@ -34,6 +34,7 @@ class DaPingTai(object):
         self.positiveState = self.setPostiveRewardState(self.ground_r)
         self.startState = self.setStartState(self.ground_r)
         self.currentState = self.startState
+        self.negativeScore = 0
 
 
 
@@ -111,14 +112,13 @@ class DaPingTai(object):
         sx, sy = self.int_to_point(state)
         flag = np.zeros((4,))
         if sx == 0:
-            flag[1] = 1      
-        if sx == len(self.grid_size) - 1:
-            flag[3] = 1
-        if sy == 0:
-            flag[2] = 1
-        if sy == len(self.grid_size) - 1:
+            flag[2] = 1      
+        if sx == self.grid_size - 1:
             flag[0] = 1
-
+        if sy == 0:
+            flag[3] = 1
+        if sy == self.grid_size - 1:
+            flag[1] = 1
         return list(np.where(flag == 0)[0])
 
 
@@ -197,7 +197,7 @@ class DaPingTai(object):
         return np.random.choice(points[ground_r_copy == 0])
 
     def getAction(self, action):
-        return self.action[action]
+        return self.actions[action]
 
     def getPostiveRewardState(self):
         """
@@ -207,7 +207,7 @@ class DaPingTai(object):
 
     def setNegativeReward(self, state_int):
         """
-        Set Negatvie rewards
+        Set Negative rewards
         """
         p = np.random.uniform()
         if p > 0.9:
@@ -248,6 +248,15 @@ class DaPingTai(object):
         matrix_ground_r = np.reshape(ground_r, (self.grid_size, self.grid_size))
         return matrix_ground_r
 
+    def increaseNegativeScore(self, score):
+        self.negativeScore = self.negativeScore + score
+
+    def getNegativeScore(self):
+        return self.negativeScore
+
+    def setNegativeScore(self, num):
+        self.negativeScore = num
+
     def average_reward(self, n_trajectories, trajectory_length, policy):
         """
         Calculate the average total reward obtained by following a given policy
@@ -277,10 +286,13 @@ class DaPingTai(object):
 
         goalState = self.getPostiveRewardState()
         gx, gy = self.int_to_point(goalState)
-        matrix_ground_r = self.convertToMatrix(ground_r)
+
+        matrix_ground_r = np.copy(self.convertToMatrix(ground_r))
+        matrix_ground_r[sx, sy] = 0
+
         maze = np.zeros(((abs(gx - sx) + 3), (abs(gy - sy) + 3)))  - 1 # Generate walls around
-        print(sx, sy, gx, gy)
-        print(maze)
+        #print(sx, sy, gx, gy)
+        #print(maze)
         extract_ground_r =  maze[1:-1, 1:-1]    
         if sx <= gx:
             if sy <= gy:
@@ -296,10 +308,12 @@ class DaPingTai(object):
             elif sy <= gy:
                 extract_ground_r = matrix_ground_r[gx:sx+1, sy:gy+1]
                 ms, mg = (len(maze) - 2, 1), (1, len(maze[0])-2)
-        print(extract_ground_r)
+        #print(extract_ground_r)
         maze[1:-1, 1:-1] = extract_ground_r
 
-        return maze, ms, mg
+        
+
+        return maze, ms, mg, sx, sy
 
     def maze2graph(self, maze):
         """
@@ -310,11 +324,11 @@ class DaPingTai(object):
         graph = {(i, j): [] for j in range(width) for i in range(height) if not maze[i][j]}
         for row, col in graph.keys():
             if row < height - 1 and not maze[row + 1][col]:
-                graph[(row, col)].append(((0, -1), (row + 1, col)))
-                graph[(row + 1, col)].append(((0, 1), (row, col)))
+                graph[(row, col)].append(((1, 0), (row + 1, col)))
+                graph[(row + 1, col)].append(((-1, 0), (row, col)))
             if col < width - 1 and not maze[row][col + 1]:
-                graph[(row, col)].append(((1, 0), (row, col + 1)))
-                graph[(row, col + 1)].append(((-1, 0), (row, col)))
+                graph[(row, col)].append(((0, 1), (row, col + 1)))
+                graph[(row, col + 1)].append(((0, -1), (row, col)))
         return graph
 
     def find_path_bfs(self, maze, ms, mg):
@@ -322,7 +336,8 @@ class DaPingTai(object):
         Take the result of BFS as our optimal policy
         """
         start, goal = ms, mg
-        queue = deque([("", start)])
+        #print(start, goal)
+        queue = deque([([], start)])
         visited = set()
         graph = self.maze2graph(maze)
         while queue:
@@ -333,25 +348,29 @@ class DaPingTai(object):
                 continue
             visited.add(current)
             for direction, neighbour in graph[current]:
-                queue.append((path + direction, neighbour))
-        return "NO WAY!"
+                temp = path[:]
+                temp.append(direction)              
+                queue.append((temp, neighbour))
+        return [(0, 0)]   # If no way, just stay
 
 
     def optimalPolicy(self, gamma):
         matrix_ground_r = self.convertToMatrix(self.ground_r)
+
         phi_sum = 0
 
  
         for state in range((self.n_states)):
-            maze, ms, mg = generatemaze(self.ground_r, state)
-            next_state = ms
+            #print('State:', state)
+
+            maze, ms, mg, sx, sy = self.generatemaze(self.ground_r, state) # Return start state of maze and real start state
             phi = np.zeros(self.n_states)
             path = self.find_path_bfs(maze, ms, mg)
+            #print(path)
 
             for t, step in enumerate(path):
-                next_state[0] = ms[0] + step[0]
-                next_state[1] = ms[1] + step[1]
-                phi = phi + (gamma ** t) * self.feature_vector(self.int_to_point(next_state))
+                
+                phi = phi + (gamma ** t) * self.feature_vector(self.point_to_int((sx + step[0], sy + step[1])))
 
             phi_sum = phi_sum + phi
 

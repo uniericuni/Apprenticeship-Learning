@@ -1,29 +1,34 @@
 from approximateAgents import *
+import sys
+sys.path.append('../gridworld/')
 from GridWorld import *
+import numpy as np
 
 class gridWorldAgent(ApproximateQLearningAgent):
 
-	def __init__(self, w, mode, alpha=0.2, epsilon=0.05, gamma=0.9):
+	def __init__(self, w, gamemgr, mode=AgentMode.estimating, alpha=0.2, epsilon=0.05, gamma=0.9):
 		ApproximateQLearningAgent.__init__(self, w, mode, alpha, epsilon, gamma)
+		self.gamemgr = gamemgr
 
 	def getStateFeature(self, state):
-    """
-    return features base on state
-    """
-    	return DaPingTai.feature_vector(state)
+		"""
+		return features base on state
+		"""
 
-    def getFeatures(self, state, action):
-    	sx, sy = DaPingTai.int_to_point(state)
-    	ax, ay = DaPingTai.getAction(action)
+		return np.reshape(self.gamemgr.feature_vector(state), (self.gamemgr.n_states, 1))
 
-    	new_sx = sx + ax
-    	new_sy = sy + ay
+	def getFeatures(self, state, action):
+		sx, sy = self.gamemgr.int_to_point(state)
+		ax, ay = self.gamemgr.getAction(action)
 
-    	new_state = DaPingTai.point_to_int(new_sx, new_sy)
+		new_sx = sx + ax
+		new_sy = sy + ay
 
-    	return DaPingTai.feature_vector(new_state)
+		new_state = self.gamemgr.point_to_int((new_sx, new_sy))
 
-    def getLegalActions(self, state):
-    	
-    	return DaPingTai.getLegalAction(state)
-    	
+		return np.reshape(self.gamemgr.feature_vector(new_state), (self.gamemgr.n_states, 1))
+
+	def getLegalActions(self, state):
+		
+		return np.array(self.gamemgr.getLegalAction(state))
+		

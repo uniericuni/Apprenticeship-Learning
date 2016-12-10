@@ -359,20 +359,27 @@ class DaPingTai(object):
 
         phi_sum = 0
 
- 
+        #print('g', matrix_ground_r)
         for state in range((self.n_states)):
-            #print('State:', state)
 
+            #print('State:', state)
+            if self.ground_r[state] == -1:
+                continue
             maze, ms, mg, sx, sy = self.generatemaze(self.ground_r, state) # Return start state of maze and real start state
-            phi = np.zeros(self.n_states)
+            #print('Start:', (sx, sy))
+            #print('Goal:', self.int_to_point(self.getPostiveRewardState()))
+            phi = self.feature_vector(self.point_to_int((sx, sy)))
             path = self.find_path_bfs(maze, ms, mg)
             #print(path)
 
             for t, step in enumerate(path):
-                
-                phi = phi + (gamma ** t) * self.feature_vector(self.point_to_int((sx + step[0], sy + step[1])))
-
+                sx = sx + step[0]
+                sy = sy + step[1]          
+                phi = phi + (gamma ** t) * self.feature_vector(self.point_to_int((sx, sy)))
+            
+            #print(np.reshape(phi, (4,4)))
             phi_sum = phi_sum + phi
+        
 
 
 

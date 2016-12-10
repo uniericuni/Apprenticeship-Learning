@@ -12,6 +12,7 @@ class gridWorldLearning(InverseLearning):
 
 	def computeExpertExpectation(self):
 		self.muExpert =  self.gamemgr.optimalPolicy(self.gamma)
+		#print(self.muExpert)
 		
 
 
@@ -29,7 +30,7 @@ class gridWorldLearning(InverseLearning):
 		while True:
 			cx, cy = self.gamemgr.int_to_point(self.gamemgr.getCurrentState())
 			print('=========================')
-			print('Current state: ', (cx, cy))
+			#print('Current state: ', (cx, cy))
 			
 			p = np.random.uniform(0, 1)
 
@@ -72,7 +73,7 @@ if __name__ == "__main__":
 	DaPingTai = DaPingTai(4, 0.3, 0.9)
 	goalstate = DaPingTai.getPostiveRewardState()
 	w = np.zeros((16, 1))
-	w[goalstate] = 1
+	#w[goalstate] = 1
 	agent = gridWorldAgent(w, DaPingTai)
 
 	learn = gridWorldLearning(agent, DaPingTai)

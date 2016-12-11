@@ -119,6 +119,7 @@ class DaPingTai(object):
             flag[3] = 1
         if sy == self.grid_size - 1:
             flag[1] = 1
+        
         return list(np.where(flag == 0)[0])
 
 

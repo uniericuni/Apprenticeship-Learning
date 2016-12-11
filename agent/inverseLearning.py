@@ -14,8 +14,9 @@ class InverseLearning:
         self.error = error
         self.featureSize = featureSize
         self.w = np.zeros((self.featureSize,1))
-        self.mus = []
-        
+        self.mus = np.zeros((featureSize,0))
+        self.policies = np.zeros((featureSize,0))
+
         self.muBar = None
         
     def train(self):
@@ -54,18 +55,22 @@ class InverseLearning:
             self.printStatus(float(i)/self.numEstimating)
             self.runGame()
             mu += self.agent.getfeatureExpection()
-        self.mus.append(mu / self.numEstimating)
+        self.mus = np.concatenate((self.mus,mu/self.numEstimating),1)
+        self.policies = np.concatenate((self.policies,self.agent.weights),1)
         # print 'mu'
-        # print self.mus[-1].T
+        # print self.mus
+        # print self.policies
 
     def updateRewardFunction(self):
+        mus = self.mus[:,-1].reshape((self.featureSize,1))
+        # print 'mus',mus.T
         if self.muBar is None:
-            self.muBar = self.mus[0]
+            self.muBar = mus
             muBar = self.muBar
         else:
-            coef = (self.mus[-1] - self.muBar).T.dot(self.muExpert - self.muBar)
-            coef = coef / (self.mus[-1] - self.muBar).T.dot(self.mus[-1] - self.muBar)
-            muBar = self.muBar + coef * (self.mus[-1] - self.muBar)
+            coef = (mus - self.muBar).T.dot(self.muExpert - self.muBar)
+            coef = coef / (mus - self.muBar).T.dot(mus - self.muBar)
+            muBar = self.muBar + coef * (mus - self.muBar)
         self.w = self.muExpert - muBar
         self.w = self.w / np.sum(np.abs(self.w))
         self.muBar = muBar
@@ -85,6 +90,18 @@ class InverseLearning:
     # override this function
     def runGame(self):
         pass
+
+    def savePolicy(self, filename):
+        sio.savemat(filename, {'policies':self.policies, 'mus':self.mus})
+
+    def loadPolicy(self, filename, i=-1):
+        m = sio.loadmat(filename)
+        self.policies = m['policies']
+        self.mus = m['mus']
+        r = r = self.policies[:,i].reshape((self.featureSize,1))
+        self.agent.setRewardVector(r)
+        # print r.T
+        # print self.mus.shape
 
 
     def printStatus(self, percent):

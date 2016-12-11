@@ -86,19 +86,19 @@ class gamemgr:
 
         # autodriving mode
         if self.mode==100 or 3:
-            if action==1:
+            if action==0:
                 self.events.append(pygame.K_a)
                 self.action = pygame.K_a
-            elif action==2:
+            elif action==1:
                 self.events.append(pygame.K_s)
                 self.action = pygame.K_s
-            elif action==3:
+            elif action==2:
                 self.events.append(pygame.K_d)
                 self.action = pygame.K_d
-            elif action==4:
+            elif action==3:
                 self.events.append(pygame.K_f)
                 self.action = pygame.K_f
-            elif action==5:
+            elif action==4:
                 self.events.append(pygame.K_g)
                 self.action = pygame.K_g
             # print action

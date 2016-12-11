@@ -10,13 +10,33 @@ class CarLearning(InverseLearning):
         self.maxIter = maxIter
         
     def computeExpertExpectation(self):
-        # m = np.array([[0.0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]])
+        # m = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
         # self.muExpert = np.zeros((self.featureSize,1))
+        # cm = np.zeros((self.featureSize,1))
+        # counter = 0.0
+        # for i in range(1,4):
+        #     # -5 -4 -3 -2 -1 0 1 2 3 4
+        #     for j in range(10):
+        #         if j >= 3 and j <= 7:
+        #             continue
+        #         else:
+        #             m = np.zeros(((self.featureSize,1)))
+        #             m[i] = 1
+        #             m[5+j] = 1
+        #         print m.T
+        #         counter += 1
+        #         for k in range(self.maxIter):
+        #             cm += ( self.gamma ** k ) * m
+        # self.muExpert = cm / counter
+        # print counter, self.muExpert.T
+
+
+        # m = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
         # for i in range(self.maxIter):
         #     self.muExpert += ( self.gamma ** i ) * m.T
         # print self.muExpert.T
 
-        f = sio.loadmat('../assets/car_records/161208020225_record.mat')['features']
+        f = sio.loadmat('../assets/car_records/161210203726_record.mat')['features']
         self.muExpert = np.zeros((self.featureSize,1))
         counter = 0
         for i in range(1,f.shape[0]-self.maxIter,self.maxIter//2):
@@ -25,7 +45,7 @@ class CarLearning(InverseLearning):
                 self.muExpert += ( self.gamma ** j ) * f[i+j-1:i+j].T
             # print self.muExpert.T
         self.muExpert = self.muExpert / counter
-        # print self.muExpert.T
+        print self.muExpert.T
 
     def runGame(self):
         # agent init
@@ -41,6 +61,7 @@ class CarLearning(InverseLearning):
 
             # action assignment
             action = self.agent.getAction((state,legal_action))
+            # print action
 
             # main game loop
             mode = self.gamemgr.input(action)

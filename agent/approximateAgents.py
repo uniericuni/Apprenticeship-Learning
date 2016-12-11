@@ -62,6 +62,7 @@ class ApproximateQLearningAgent:
         self.mode = mode
         self.w = w
         self.t = 0
+        self.setMode(mode)
 
     ##########################
     # methods called in game #
@@ -70,12 +71,6 @@ class ApproximateQLearningAgent:
         """
         call before game
         """
-        if self.isInTraining():
-            self.epsilon = self.trainEpsilon
-            self.alpha = self.trainAlpha
-        else:
-            self.epsilon = 0.0
-            self.alpha = 0.0
 
         self.lastState = None
         self.lastAction = None
@@ -193,6 +188,13 @@ class ApproximateQLearningAgent:
     def setMode(self, mode):
         self.mode = mode
 
+        if self.isInTraining():
+            self.epsilon = self.trainEpsilon
+            self.alpha = self.trainAlpha
+        else:
+            self.epsilon = 0.0
+            self.alpha = 0.0
+
     def isInEstimating(self):
         return self.mode == AgentMode.estimating
 
@@ -227,3 +229,5 @@ class ApproximateQLearningAgent:
         m = sio.loadmat(filename)
         self.weights = m['weights']
         self.w = m['w']
+        print self.w.T
+        print self.weights.T

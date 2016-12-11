@@ -15,6 +15,7 @@ class InverseLearning:
         self.featureSize = featureSize
         self.w = np.zeros((self.featureSize,1))
         self.mus = []
+        
         self.muBar = None
         
     def train(self):
@@ -54,8 +55,8 @@ class InverseLearning:
             self.runGame()
             mu += self.agent.getfeatureExpection()
         self.mus.append(mu / self.numEstimating)
-        out = str(len(self.mus))+str(self.mus[-1].shape)
-        sys.stdout.write(out+'\n')
+        # print 'mu'
+        # print self.mus[-1].T
 
     def updateRewardFunction(self):
         if self.muBar is None:
@@ -66,15 +67,20 @@ class InverseLearning:
             coef = coef / (self.mus[-1] - self.muBar).T.dot(self.mus[-1] - self.muBar)
             muBar = self.muBar + coef * (self.mus[-1] - self.muBar)
         self.w = self.muExpert - muBar
+        self.w = self.w / np.sum(np.abs(self.w))
         self.muBar = muBar
         self.agent.setRewardVector(self.w)
-        return np.linalg.norm(self.w)
+        # print 'w'
+        # print self.w.T
+        return np.linalg.norm(self.muExpert - muBar)
         
     def updateAgent(self):
         self.agent.setMode(AgentMode.training)
         for i in range(self.numRLTraining):
             self.printStatus(float(i)/self.numRLTraining)
             self.runGame()
+        # print 'weights'
+        # print self.agent.weights.T
 
     # override this function
     def runGame(self):

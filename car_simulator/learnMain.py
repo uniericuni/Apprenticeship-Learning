@@ -13,27 +13,40 @@ if __name__ == '__main__':
     from carAgents import *
     from carLearning import *
 
-    gamemgr = game.gamemgr(mode=3)
+    gamemgr = game.gamemgr(mode=100)
+    mode = gamemgr.input()
+    feature,state,legal_action = gamemgr.update()
+    sys.stdout.write('pre-running ...'+'\n')
+    for i in range(0,100):
+        mode = gamemgr.input()
+        feature,state,legal_action = gamemgr.update()
+
     agent = CarAgent(w=np.zeros([15,1]))
-    learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=100, numRLTraining=50, numTraining=100)
-    state = np.zeros((5,11))
-    state[0][0] = 1
-    legal_action = np.array([0,1,2,3,4])
-    learn.agent.registerInitialState((state, legal_action))
+    learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=100, numRLTraining=100, numTraining=50)
+    r = np.zeros((15,1));
+    r[0] = -5.0
+    r[2] = 0.5
+    r[4] = -5.0
+    r[11] = -5.0
+    r[10] = -10.0
+    r[9] = -5.0
+    r[14] = 0.5
+    # r[10] = 10.0
+    # r[0] = -5
+    # r[4] = -5 
+    # r = r - np.min(r)
+    r = r / np.sum(np.abs(r))
+    learn.agent.setRewardVector(r)
+    learn.updateAgent()
+    print agent.w.T
+    print agent.weights.T
 
-    # main game loop
-    learn.agent.setMode(AgentMode.training)
-    while True:
-        learn.runGame()
-        # action assignment
-        # learn.agent.registerInitialState((state, legal_action))
-        # for i in range(100):
-        #     action = learn.agent.getAction((state,legal_action))
-        # learn.agent.final((state,legal_action))
-
-
-    # agent = CarAgent(w=np.zeros([15,1]))
-    # learn = CarLearning(agent=agent,maxIter=100,numEstimating=10,numTraining=10)
-    # learn.computeExpertExpectation()
-    # learn.train()
-    # learn.runGame()
+    gamemgr = game.gamemgr(mode=3)
+    mode = gamemgr.input()
+    feature,state,legal_action = gamemgr.update()
+    sys.stdout.write('pre-running ...'+'\n')
+    for i in range(0,100):
+        mode = gamemgr.input()
+        feature,state,legal_action = gamemgr.update()
+    learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=100, numRLTraining=50, numTraining=50)
+    learn.test()

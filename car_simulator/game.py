@@ -56,6 +56,7 @@ class gamemgr:
         # event message
         self.events = []
         self.action = None
+        # TODO: self.onLane = 2
 
     def input(self, action=None):
 
@@ -155,10 +156,12 @@ class gamemgr:
             self.objects[0].accelerate([xacc,yacc])
 
         # update main character status: state 2
+        # TODO: if lane!=0 and lane<=self.background.lanenum and (not self.objects[0].istargeting):
         if lane!=0 and lane<=self.background.lanenum:
             pos = np.array(self.background.spawnpoint[lane-1])
             pos[1] = self.objects[0].position[1]
             self.objects[0].settarget(pos)
+            # TODO: self.onLane=lane-1
 
         # update main background status: state 2
         if lanenum!=0:
@@ -187,7 +190,7 @@ class gamemgr:
         # update background and font interface
         pos = main.position
         spd = main.speed
-        onLane = 0
+        # TODO: onLane = self.onLane
         dist = float('inf')
         for i,sp in enumerate(self.background.spawnpoint):
             if abs(sp[0]-main.position[0])<dist:
@@ -234,7 +237,7 @@ class gamemgr:
             feature = [0]*15
             feature[onLane] = 1
             feature[qdist[onLane]+10] = 1
-        print state
+
         return feature,state,legal_action
 
     def render(self):

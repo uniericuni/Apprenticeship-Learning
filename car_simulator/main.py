@@ -29,7 +29,7 @@ def main(argv):
         learn.computeExpertExpectation()
         learn.train()
         # learn.agent.savePolicy('policyMiddle.mat')
-        learn.savePolicy('policyNastyRight.mat')
+        learn.savePolicy('policy.mat')
 
     # auto mode
     elif gamemode==3:
@@ -41,7 +41,7 @@ def main(argv):
         agent = CarAgent(w=np.zeros([15,1]))
         learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=10, numRLTraining=10)
         # learn.agent.loadPolicy('policyMiddle.mat')
-        learn.loadPolicy('policyNastyRight.mat',30)
+        learn.loadPolicy('learnBump.mat',48)
         learn.computeExpertExpectation()
         learn.test()
 

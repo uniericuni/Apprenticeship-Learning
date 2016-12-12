@@ -234,7 +234,7 @@ class gamemgr:
             feature = [0]*15
             feature[onLane] = 1
             feature[qdist[onLane]+10] = 1
-
+        print state
         return feature,state,legal_action
 
     def render(self):

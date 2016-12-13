@@ -36,7 +36,7 @@ class gridWorldLearning(InverseLearning):
 				print('=========================')		
 				print('Current state: ', (cx, cy))
 				p = np.random.uniform(0, 1)
-
+				 
 				if  p > self.gamemgr.wind:	
 					action = self.agent.getAction(currentState) # Specific action
 					print('Specific action:', action)

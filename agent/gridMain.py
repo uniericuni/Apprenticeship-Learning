@@ -18,3 +18,5 @@ if __name__ == "__main__":
 
     print(learn.gamemgr.convertToMatrix(learn.gamemgr.ground_r)), goalstate
     learn.computeExpertExpectation()
+    learn.train()
+    learn.test()

@@ -4,7 +4,7 @@ import time
 import scipy.io as sio
 from config import *
 
-MAX_ITERATION = 100
+MAX_ITERATION = 1000
 
 if __name__ == '__main__':
 
@@ -24,16 +24,24 @@ if __name__ == '__main__':
     agent = CarAgent(w=np.zeros([15,1]))
     learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=100, numRLTraining=100, numTraining=50)
     r = np.zeros((15,1));
-    r[0] = -5.0
-    r[2] = 0.5
-    r[4] = -5.0
-    r[11] = -5.0
-    r[10] = -10.0
-    r[9] = -5.0
-    r[14] = 0.5
-    # r[10] = 10.0
-    # r[0] = -5
-    # r[4] = -5 
+    # r[0] = -5.0
+    # r[2] = 0.5
+    # r[4] = -5.0
+    # r[11] = -5.0
+    # r[10] = -10.0
+    # r[9] = -5.0
+    # r[14] = 0.5
+
+    r[10] = 10.0
+    r[0] = -5
+    r[4] = -5 
+     
+    # r[10] = 3.0
+    # r[3] = 1.0
+    # r[4] = 3.0
+    # r[1] = -10.0
+    # r[2] = -10.0
+    
     # r = r - np.min(r)
     r = r / np.sum(np.abs(r))
     learn.agent.setRewardVector(r)

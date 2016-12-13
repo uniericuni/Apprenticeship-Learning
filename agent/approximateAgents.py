@@ -125,6 +125,8 @@ class ApproximateQLearningAgent:
             self.weights += self.alpha * correction * features
         if self.isInEstimating():
             self.mu += self.getStateFeature(nextState) * self.gamma ** self.t
+        # if reward != 0:
+        # print self.weights.T, reward
       
 
     ##############################
@@ -229,5 +231,5 @@ class ApproximateQLearningAgent:
         m = sio.loadmat(filename)
         self.weights = m['weights']
         self.w = m['w']
-        print self.w.T
-        print self.weights.T
+        # print self.w.T
+        # print self.weights.T

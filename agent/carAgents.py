@@ -28,3 +28,38 @@ class CarAgent(ApproximateQLearningAgent):
 
     def getLegalActions(self, state):
         return state[1]
+
+
+class CarAgent2(CarAgent):
+    """docstring for CarAgent2"""
+    def __init__(self,  w, mode=AgentMode.estimating, alpha=0.2, epsilon=0.05, gamma=0.99):
+        CarAgent.__init__(self,  w, mode, alpha, epsilon, gamma)
+        
+    def getFeatures(self, state, action):
+        """
+        return features base on state and action
+        """
+        myLane = 0.0
+        for i in range(state[0].shape[0]):
+            if state[0][i][0] == 1:
+                myLane = i
+                break
+
+        distance = abs(action - myLane)
+
+        nearestFront = 0
+        for i in range(distance,state[0].shape[0]):
+            if state[0][action][6+i] == 1:
+                nearestFront = 5-i
+                break
+
+        nearestBack = 10
+        for i in range(distance+state[0].shape[0]):
+            if state[0][action][6+distance-i] == 1:
+                nearestBack = i
+                break
+
+        lane = np.zeros((1, state[0].shape[0]))
+        lane[0][action] = 1.0
+        # print np.concatenate((lane, np.array([[nearestFront, nearestBack]])),1)
+        return np.concatenate((lane, np.array([[nearestFront, nearestBack]])),1).T

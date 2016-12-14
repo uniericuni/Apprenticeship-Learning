@@ -59,4 +59,7 @@ class gridWorldQAgent(QLearningAgent):
 	def getLegalActions(self, state):
 		
 		return np.array(self.gamemgr.getLegalAction(state))
+
+	def hashableState(self, state):
+		return state
 		

@@ -186,7 +186,7 @@ class QLearningAgent:
         pass
 
     def hashableState(self, state):
-        pass
+        return str(state)
 
 
     #####################

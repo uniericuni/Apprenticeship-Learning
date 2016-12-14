@@ -7,7 +7,7 @@ import numpy as np
 
 class gridWorldLearning(InverseLearning):
 
-	def __init__(self, agent, DaPingTai, featureSize=16, error=0.001, numEstimating=100, numTraining=50, numRLTraining=50):
+	def __init__(self, agent, DaPingTai, featureSize=16, error=0.001, numEstimating=100, numTraining=1, numRLTraining=50):
 		InverseLearning.__init__(self, agent=agent, gamemgr=DaPingTai, featureSize=featureSize, error=error, numEstimating=numEstimating, numTraining=numTraining, numRLTraining=numRLTraining)
 
 	def computeExpertExpectation(self):
@@ -71,7 +71,7 @@ class gridWorldLearning(InverseLearning):
 				#print('Current state: ', (cx, cy))
 				
 				p = np.random.uniform(0, 1)
-
+				p = 1
 				if  p > self.gamemgr.wind:		
 
 					action = self.agent.getAction(currentState) # Specific action
@@ -100,7 +100,8 @@ class gridWorldLearning(InverseLearning):
 					#print('Good!')
 					break
 				count += 1
-				
+
+
 
 		#print('Negative Score: ', self.gamemgr.getNegativeScore())
 
@@ -112,18 +113,22 @@ if __name__ == "__main__":
 	DaPingTai = DaPingTai(4, 0.3, 1)
 	goalstate = DaPingTai.getPostiveRewardState()
 	w = np.zeros((16, 1))
+	w = np.array([0, 0, -1, 1, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0]).reshape(16, 1)
 	#w[goalstate] = 1
 	agent = gridWorldQAgent(w, DaPingTai)
 
 	learn = gridWorldLearning(agent, DaPingTai)
 
 	learn.computeExpertExpectation()
-
+	# learn.updateAgent()
+	
 	learn.train()
-	learn.test()
-	learn.test()
-	learn.test()
-	learn.test()
+	
+	# learn.test()
+
+	# learn.test()
+	# learn.test()
+	# learn.test()
 
 
 

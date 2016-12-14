@@ -7,7 +7,7 @@ import numpy as np
 
 class gridWorldLearning(InverseLearning):
 
-	def __init__(self, agent, DaPingTai, featureSize=16, error=0.001, numEstimating=100, numTraining=1, numRLTraining=50):
+	def __init__(self, agent, DaPingTai, featureSize=16, error=0.001, numEstimating=100, numTraining=50, numRLTraining=50):
 		InverseLearning.__init__(self, agent=agent, gamemgr=DaPingTai, featureSize=featureSize, error=error, numEstimating=numEstimating, numTraining=numTraining, numRLTraining=numRLTraining)
 
 	def computeExpertExpectation(self):

@@ -71,7 +71,7 @@ class QLearningAgent:
         """
         call before game
         """
-
+        # print 'init', state
         self.lastState = None
         self.lastAction = None
         self.episodeRewards = 0.0
@@ -83,6 +83,7 @@ class QLearningAgent:
         call in each step of game,
         give a state return an action
         """
+        # print ('get',state)
         if not self.lastState is None: 
             reward = self.getScore(state) # - self.getScore(self.lastState)
             self.observeTransition(self.lastState, self.lastAction, state, reward)
@@ -101,7 +102,9 @@ class QLearningAgent:
         """
         call after the game
         """
+        # print 'final'
         deltaReward = self.getScore(state) # - self.getScore(self.lastState)
+        # print(self.lastState)
         self.observeTransition(self.lastState, self.lastAction, state, deltaReward)
         # print self.episodeRewards
         # print self.episodeRewards
@@ -111,6 +114,8 @@ class QLearningAgent:
     # helper methods #
     ##################
     def observeTransition(self, state, action, nextState, deltaReward):
+        # print('state:', state)
+
         self.episodeRewards += deltaReward
         self.update(state, action, nextState, deltaReward)
 
@@ -132,12 +137,14 @@ class QLearningAgent:
     # getter for learning values #
     ##############################
     def getScore(self, state):
+        # print('state:', state)
+        # if state == 2 or state == 6 or state == 10:
+            # print self.w.T.dot(self.getStateFeature(state)), self.w.T, self.getStateFeature(state).T
         return self.w.T.dot(self.getStateFeature(state))
 
     def getQValue(self, state, action):
         if self.Qtable.has_key(self.hashableState(state)):
             return (self.Qtable[self.hashableState(state)])[action]
-
         self.Qtable[self.hashableState(state)] = {}
         for action in self.getLegalActions( state ):
             self.Qtable[self.hashableState(state)][action] = 0.0
@@ -224,6 +231,7 @@ class QLearningAgent:
         self.w = w
     
     def doAction(self,state,action):
+        # print('do',state)
         self.lastState = state
         self.lastAction = action
         self.t += 1

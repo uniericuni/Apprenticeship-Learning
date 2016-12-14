@@ -21,23 +21,25 @@ if __name__ == '__main__':
         mode = gamemgr.input()
         feature,state,legal_action = gamemgr.update()
 
-    agent = CarAgent(w=np.zeros([15,1]))
-    learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=100, numRLTraining=100, numTraining=50)
+    agent = CarAgent3(w=np.zeros([15,1]))
+    learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=100, numRLTraining=300, numTraining=50)
     r = np.zeros((15,1));
-    # r[0] = -5.0
-    # r[2] = 0.5
-    # r[4] = -5.0
-    # r[11] = -5.0
-    # r[10] = -10.0
-    # r[9] = -5.0
-    # r[14] = 0.5
+    r[0] = -5.0
+    r[1] = 2
+    r[2] = 2
+    r[3] = 2
+    r[4] = -5.0
+    r[11] = -5.0
+    r[10] = -10.0
+    r[9] = -5.0
+    r[14] = 0.5
 
-    r[10] = 10.0
-    r[0] = -5
-    r[4] = -5 
+    # r[10] = 10.0
+    # r[0] = -5
+    # r[4] = -5 
      
     # r[10] = 3.0
-    # r[3] = 1.0
+    # r[3] = 2.0
     # r[4] = 3.0
     # r[1] = -10.0
     # r[2] = -10.0
@@ -47,7 +49,8 @@ if __name__ == '__main__':
     learn.agent.setRewardVector(r)
     learn.updateAgent()
     print agent.w.T
-    print agent.weights.T
+    # print agent.Qtable
+    # print agent.weights.T
 
     gamemgr = game.gamemgr(mode=3)
     mode = gamemgr.input()

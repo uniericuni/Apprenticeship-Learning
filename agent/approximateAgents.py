@@ -12,7 +12,7 @@ class AgentMode:
     testing = 3
         
 
-class ApproximateQLearningAgent:
+class QLearningAgent:
     """
     Abstract class of approximate q-learning agent.
     Must override 
@@ -58,11 +58,11 @@ class ApproximateQLearningAgent:
         self.trainEpsilon = float(epsilon)
         self.trainAlpha = float(alpha)
         self.gamma = float(gamma)
-        self.weights = None
         self.mode = mode
         self.w = w
         self.t = 0
         self.setMode(mode)
+        self.Qtable = {}
 
     ##########################
     # methods called in game #
@@ -84,7 +84,7 @@ class ApproximateQLearningAgent:
         give a state return an action
         """
         if not self.lastState is None: 
-            reward = self.getScore(state) - self.getScore(self.lastState)
+            reward = self.getScore(state) # - self.getScore(self.lastState)
             self.observeTransition(self.lastState, self.lastAction, state, reward)
 
         legalActions = self.getLegalActions(state)
@@ -101,8 +101,10 @@ class ApproximateQLearningAgent:
         """
         call after the game
         """
-        deltaReward = self.getScore(state) - self.getScore(self.lastState)
+        deltaReward = self.getScore(state) # - self.getScore(self.lastState)
         self.observeTransition(self.lastState, self.lastAction, state, deltaReward)
+        # print self.episodeRewards
+        # print self.episodeRewards
 
 
     ##################
@@ -116,17 +118,11 @@ class ApproximateQLearningAgent:
         """
         update weights and mu if in estimating mode
         """
-        # print self.mu.T, self.mode
-        features = self.getFeatures( state, action )
-        correction = reward + self.gamma * self.getValue( nextState ) - self.getQValue( state, action )
-        if self.weights is None:
-            self.weights = self.alpha * correction * features
-        else:
-            self.weights += self.alpha * correction * features
-        if self.isInEstimating():
-            self.mu += self.getStateFeature(nextState) * self.gamma ** self.t
-        # if reward != 0:
-        # print self.weights.T, reward
+        # print self.hashableState(state)
+        self.getQValue( state, action )
+        (self.Qtable[self.hashableState(state)])[action] += self.alpha * ( reward + self.gamma * self.getValue( nextState ) - (self.Qtable[self.hashableState(state)])[action] )
+
+        
       
 
     ##############################
@@ -136,11 +132,14 @@ class ApproximateQLearningAgent:
         return self.w.T.dot(self.getStateFeature(state))
 
     def getQValue(self, state, action):
-        if not self.weights is None:
-            features = self.getFeatures(state, action)
-            return self.weights.T.dot(features)
-        else:
-            return 0.0
+        if self.Qtable.has_key(self.hashableState(state)):
+            return (self.Qtable[self.hashableState(state)])[action]
+
+        self.Qtable[self.hashableState(state)] = {}
+        for action in self.getLegalActions( state ):
+            self.Qtable[self.hashableState(state)][action] = 0.0
+        return 0.0
+        
   
     def getValue(self, state):
         actions = self.getLegalActions( state )
@@ -183,6 +182,9 @@ class ApproximateQLearningAgent:
         """
         pass
 
+    def hashableState(self, state):
+        pass
+
 
     #####################
     # getter and setter #
@@ -223,6 +225,61 @@ class ApproximateQLearningAgent:
         self.lastAction = action
         self.t += 1
 
+    def getPolicyTable(self):
+        return self.Qtable
+
+    def setPolicyTable(self, p):
+        self.Qtable = p
+
+    def savePolicy(self, filename):
+        sio.savemat(filename, {'Qtable':self.Qtable, 'w':self.w})
+
+    def loadPolicy(self, filename):
+        m = sio.loadmat(filename)
+        self.Qtable = m['Qtable']
+        self.w = m['w']
+        # print self.w.T
+        # print self.weights.T
+
+
+class ApproximateQLearningAgent(QLearningAgent):
+
+    def __init__(self, w, mode=AgentMode.estimating, alpha=0.2, epsilon=0.05, gamma=0.8):
+        QLearningAgent.__init__(self, w, mode, alpha, epsilon, gamma)
+        self.weights = None
+
+
+
+    def update(self, state, action, nextState, reward):
+        """
+        update weights and mu if in estimating mode
+        """
+        # print self.mu.T, self.mode
+        # if reward:
+        #     print reward
+        features = self.getFeatures( state, action )
+        correction = reward + self.gamma * self.getValue( nextState ) - self.getQValue( state, action )
+        if self.weights is None:
+            self.weights = self.alpha * correction * features
+        else:
+            self.weights += self.alpha * correction * features
+        if self.isInEstimating():
+            self.mu += self.getStateFeature(nextState) * self.gamma ** self.t
+        # if reward != 0:
+        # print self.weights.T, reward
+
+    def getQValue(self, state, action):
+        if not self.weights is None:
+            features = self.getFeatures(state, action)
+            return self.weights.T.dot(features)
+        else:
+            return 0.0
+
+    def getPolicyTable(self):
+        return self.weights
+
+    def setPolicyTable(self, p):
+        self.weights = p
 
     def savePolicy(self, filename):
         sio.savemat(filename, {'weights':self.weights, 'w':self.w})
@@ -231,5 +288,3 @@ class ApproximateQLearningAgent:
         m = sio.loadmat(filename)
         self.weights = m['weights']
         self.w = m['w']
-        # print self.w.T
-        # print self.weights.T

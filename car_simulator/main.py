@@ -23,12 +23,12 @@ def main(argv):
         for i in range(0,100):
             mode = gamemgr.input()
             feature,state,legal_action = gamemgr.update()
-        agent = CarAgent(w=np.zeros([15,1]))
-        learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=100, numRLTraining=50, numTraining=50)
+        agent = CarAgent3(w=np.zeros([15,1]))
+        learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=100, numRLTraining=300, numTraining=50)
         # learn.agent.loadPolicy('policy.mat')
         learn.computeExpertExpectation()
         learn.train()
-        # learn.agent.savePolicy('policyMiddle.mat')
+        # learn.agent.savePolicy('policyMiddle2.mat')
         learn.savePolicy('policy.mat')
 
     # auto mode
@@ -38,10 +38,10 @@ def main(argv):
         for i in range(0,100):
             mode = gamemgr.input()
             feature,state,legal_action = gamemgr.update()
-        agent = CarAgent(w=np.zeros([15,1]))
+        agent = CarAgent3(w=np.zeros([15,1]))
         learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=10, numRLTraining=10)
         # learn.agent.loadPolicy('policyMiddle.mat')
-        learn.loadPolicy('learnBump.mat',48)
+        learn.loadPolicy('policy.mat')
         learn.computeExpertExpectation()
         learn.test()
 

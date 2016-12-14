@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 from approximateAgents import *
+import pickle
 
 class InverseLearning:
     """docstring for inverseLearning"""
@@ -15,7 +16,7 @@ class InverseLearning:
         self.featureSize = featureSize
         self.w = np.zeros((self.featureSize,1))
         self.mus = np.zeros((featureSize,0))
-        self.policies = np.zeros((featureSize,0))
+        self.policies = []
 
         self.muBar = None
         
@@ -56,7 +57,7 @@ class InverseLearning:
             self.runGame()
             mu += self.agent.getfeatureExpection()
         self.mus = np.concatenate((self.mus,mu/self.numEstimating),1)
-        self.policies = np.concatenate((self.policies,self.agent.weights),1)
+        self.policies.append(self.agent.getPolicyTable())
         # print 'mu'
         # print self.mus
         # print self.policies
@@ -92,14 +93,20 @@ class InverseLearning:
         pass
 
     def savePolicy(self, filename):
-        sio.savemat(filename, {'policies':self.policies, 'mus':self.mus})
+        f = open(filename, 'w')
+        pickle.dump({'policies':self.policies, 'mus':self.mus},f)
+        f.close()
+        # sio.savemat(filename, {'policies':self.policies, 'mus':self.mus})
+        # print self.policies[-1]
 
     def loadPolicy(self, filename, i=-1):
-        m = sio.loadmat(filename)
+        f = open(filename)
+        m = pickle.load(f)
+        # m = sio.loadmat(filename)
         self.policies = m['policies']
         self.mus = m['mus']
-        r = r = self.policies[:,i].reshape((self.featureSize,1))
-        self.agent.setRewardVector(r)
+        self.agent.setPolicyTable(m['policies'][i])
+        # print self.policies[-1]
         # print r.T
         # print self.mus.shape
 

@@ -37,6 +37,7 @@ class CarLearning(InverseLearning):
         # print self.muExpert.T
 
         f = sio.loadmat('../assets/car_records/20161211_NastyRightLaneVer2.mat')['features']
+        print f.shape
         self.muExpert = np.zeros((self.featureSize,1))
         counter = 0
         for i in range(1,f.shape[0]-self.maxIter,self.maxIter//2):
@@ -45,7 +46,7 @@ class CarLearning(InverseLearning):
                 self.muExpert += ( self.gamma ** j ) * f[i+j-1:i+j].T
             # print self.muExpert.T
         self.muExpert = self.muExpert / counter
-        # print self.muExpert.T
+        print self.muExpert.T
 
     def runGame(self):
         # agent init
@@ -58,7 +59,7 @@ class CarLearning(InverseLearning):
 
         # main game loop
         while mode and ( self.agent.isInTesting() or counter<self.maxIter ):
-
+            # print counter
             # action assignment
             action = self.agent.getAction((state,legal_action))
             # print action

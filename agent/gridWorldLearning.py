@@ -100,6 +100,7 @@ class gridWorldLearning(InverseLearning):
 					#print('Good!')
 					break
 				count += 1
+				
 
 		#print('Negative Score: ', self.gamemgr.getNegativeScore())
 
@@ -112,7 +113,7 @@ if __name__ == "__main__":
 	goalstate = DaPingTai.getPostiveRewardState()
 	w = np.zeros((16, 1))
 	#w[goalstate] = 1
-	agent = gridWorldAgent(w, DaPingTai)
+	agent = gridWorldQAgent(w, DaPingTai)
 
 	learn = gridWorldLearning(agent, DaPingTai)
 

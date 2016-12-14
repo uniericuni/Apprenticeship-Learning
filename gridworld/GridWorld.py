@@ -295,5 +295,7 @@ class DaPingTai(object):
             #print(np.reshape(phi, (4,4)))
             phi_sum = phi_sum + phi
         
+        phi_sum = np.reshape(phi_sum, (self.n_states, 1))
+
         return phi_sum / self.n_states
 

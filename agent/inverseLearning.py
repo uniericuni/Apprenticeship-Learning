@@ -63,6 +63,7 @@ class InverseLearning:
         # print self.policies
 
     def updateRewardFunction(self):
+
         mus = self.mus[:,-1].reshape((self.featureSize,1))
         # print 'mus',mus.T
         if self.muBar is None:
@@ -70,10 +71,12 @@ class InverseLearning:
             muBar = self.muBar
         else:
             coef = (mus - self.muBar).T.dot(self.muExpert - self.muBar)
+            # if coef != 0:
             coef = coef / (mus - self.muBar).T.dot(mus - self.muBar)
             muBar = self.muBar + coef * (mus - self.muBar)
         self.w = self.muExpert - muBar
         self.w = self.w / np.sum(np.abs(self.w))
+        # print('w', self.w.T)
         self.muBar = muBar
         self.agent.setRewardVector(self.w)
         # print 'w'

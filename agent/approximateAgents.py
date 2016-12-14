@@ -120,9 +120,12 @@ class QLearningAgent:
         """
         # print self.hashableState(state)
         self.getQValue( state, action )
-        (self.Qtable[self.hashableState(state)])[action] += self.alpha * ( reward + self.gamma * self.getValue( nextState ) - (self.Qtable[self.hashableState(state)])[action] )
-
-        
+        # print(self.getValue( nextState ).shape, (self.Qtable[self.hashableState(state)])[action].shape)
+        # print('h', self.alpha * ( reward + self.gamma * self.getValue( nextState ) - (self.Qtable[self.hashableState(state)])[action] ))
+        # print('R',reward)
+        (self.Qtable[self.hashableState(state)])[action] += self.alpha * ( reward + self.gamma * self.getValue( nextState ) - (self.Qtable[self.hashableState(state)])[action] )      
+        if self.isInEstimating():
+            self.mu += self.getStateFeature(nextState) * self.gamma ** self.t
       
 
     ##############################

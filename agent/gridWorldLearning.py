@@ -7,7 +7,7 @@ import numpy as np
 
 class gridWorldLearning(InverseLearning):
 
-	def __init__(self, agent, DaPingTai, featureSize=16, error=0.001, numEstimating=100, numTraining=1, numRLTraining=50):
+	def __init__(self, agent, DaPingTai, featureSize=16, error=0.001, numEstimating=100, numTraining=50, numRLTraining=300):
 		InverseLearning.__init__(self, agent=agent, gamemgr=DaPingTai, featureSize=featureSize, error=error, numEstimating=numEstimating, numTraining=numTraining, numRLTraining=numRLTraining)
 
 	def computeExpertExpectation(self):
@@ -36,9 +36,9 @@ class gridWorldLearning(InverseLearning):
 				print('=========================')		
 				print('Current state: ', (cx, cy))
 				p = np.random.uniform(0, 1)
-				 
+				action = self.agent.getAction(currentState)
 				if  p > self.gamemgr.wind:	
-					action = self.agent.getAction(currentState) # Specific action
+					 # Specific action
 					print('Specific action:', action)
 					ax, ay = self.gamemgr.getAction(action)     # Action to tuple
 
@@ -66,15 +66,17 @@ class gridWorldLearning(InverseLearning):
 				count += 1
 		else:
 			while True:
+				# print('Current state')
+				currentState = self.gamemgr.getCurrentState()
 				cx, cy = self.gamemgr.int_to_point(self.gamemgr.getCurrentState())
 				#print('=========================')		
 				#print('Current state: ', (cx, cy))
-				
+				# print('P')
 				p = np.random.uniform(0, 1)
-				p = 1
+				action = self.agent.getAction(currentState) 
 				if  p > self.gamemgr.wind:		
 
-					action = self.agent.getAction(currentState) # Specific action
+					# Specific action
 					#print('Specific action:', action)
 					ax, ay = self.gamemgr.getAction(action)     # Action to tuple
 
@@ -83,24 +85,26 @@ class gridWorldLearning(InverseLearning):
 					#print('Random action', action)
 					ax, ay = self.gamemgr.getAction(action)
 
-				
+
+				# print('OffGrid')
 				#print('Next State:', (cx + ax, cy + ay))
 				if cx + ax < 0 or cx + ax >= self.gamemgr.grid_size or cy + ay < 0 or cy + ay >= self.gamemgr.grid_size:
 					#print('Out of Grid!')
 					self.gamemgr.increaseNegativeScore(-1)
 					continue
-
+				# print('nextstate')
 				next_state = self.gamemgr.point_to_int((cx + ax, cy + ay))
 				if self.gamemgr.ground_r[next_state] == -1:
 					self.gamemgr.increaseNegativeScore(-1)
 					#print('Step on negative!!')
 				self.gamemgr.setCurrentState(next_state)
 				#new_state = self.gamemgr.getCurrentState()
+				# print('Check goal')
 				if next_state == self.gamemgr.getPostiveRewardState():
 					#print('Good!')
 					break
 				count += 1
-
+		self.agent.final(next_state)
 
 
 		#print('Negative Score: ', self.gamemgr.getNegativeScore())
@@ -113,7 +117,7 @@ if __name__ == "__main__":
 	DaPingTai = DaPingTai(4, 0.3, 1)
 	goalstate = DaPingTai.getPostiveRewardState()
 	w = np.zeros((16, 1))
-	w = np.array([0, 0, -1, 1, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0]).reshape(16, 1)
+	# w = np.array([0, 0, -1, 1, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0]).reshape(16, 1)
 	#w[goalstate] = 1
 	agent = gridWorldQAgent(w, DaPingTai)
 
@@ -124,11 +128,11 @@ if __name__ == "__main__":
 	
 	learn.train()
 	
-	# learn.test()
+	learn.test()
 
-	# learn.test()
-	# learn.test()
-	# learn.test()
+	learn.test()
+	learn.test()
+	learn.test()
 
 
 

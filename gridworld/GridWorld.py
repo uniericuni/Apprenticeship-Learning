@@ -30,12 +30,12 @@ class DaPingTai(object):
         self.wind = wind
         self.discount = discount
         # Construct whole map as an n_states x 1 array
-        self.ground_r = np.array([self.setNegativeReward(s) for s in range(self.n_states)])
-        # self.ground_r = np.array([0, 0, -1, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0])
-        self.positiveState = self.setPostiveRewardState(self.ground_r)
-        # self.positiveState = 3
-        self.startState = self.setStartState(self.ground_r)
-        # self.startState = 0
+        # self.ground_r = np.array([self.setNegativeReward(s) for s in range(self.n_states)])
+        self.ground_r = np.array([0, 0, -1, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0])
+        # self.positiveState = self.setPostiveRewardState(self.ground_r)
+        self.positiveState = 3
+        # self.startState = self.setStartState(self.ground_r)
+        self.startState = 0
         self.currentState = self.startState
         self.negativeScore = 0
 
@@ -110,6 +110,7 @@ class DaPingTai(object):
         return abs(i[0] - k[0]) + abs(i[1] - k[1]) <= 1
 
     def getLegalAction(self, state):
+        # print('L State', state)
         sx, sy = self.int_to_point(state)
         flag = np.zeros((4,))
         if sx == 0:

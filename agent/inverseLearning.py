@@ -19,7 +19,9 @@ class InverseLearning:
         self.policies = []
 
         self.muBar = None
-        
+    
+
+
     def train(self):
         sys.stdout.write('training:'+'\n')
         self.featureExpectation()

@@ -1,5 +1,5 @@
 from inverseLearning import *
-
+import matplotlib.pyplot as plt
 
 import sys
 
@@ -8,14 +8,38 @@ import numpy as np
 class gridWorldLearning(InverseLearning):
 
 
-	def __init__(self, agent, DaPingTai, featureSize=16, error=0.001, numEstimating=100, numTraining=50, numRLTraining=300):
+	def __init__(self, agent, DaPingTai, random, numberOfTrajectories, featureSize=25, error=0.001, numEstimating=100, numTraining=50, numRLTraining=300):
 		InverseLearning.__init__(self, agent=agent, gamemgr=DaPingTai, featureSize=featureSize, error=error, numEstimating=numEstimating, numTraining=numTraining, numRLTraining=numRLTraining)
-
+		self.t =[]
+		self.count = []
+		self.random = random
+		self.numberOfTrajectories = numberOfTrajectories
 	def computeExpertExpectation(self):
-		self.muExpert =  self.gamemgr.optimalPolicy(self.gamma)
-		print('expert', self.muExpert)
+		self.muExpert =  self.gamemgr.optimalPolicy(self.gamma, self.numberOfTrajectories)
 		
+	def getError(self, t, count):
+		self.t.append(t)
+		self.count.append(count)
 
+	def train(self):
+		sys.stdout.write('training:'+'\n')
+		self.featureExpectation()
+		t = self.updateRewardFunction()
+		counter = 0
+		while t > self.error and ( self.numTraining < 0 or counter < self.numTraining ):
+			self.updateAgent()
+			self.featureExpectation()
+			self.getError(t, counter)
+			t = self.updateRewardFunction()
+			sys.stdout.write( '\r' )
+			sys.stdout.write( ' ' * 70 )
+			sys.stdout.write( '\r' )
+			sys.stdout.write( ' ' * 39)
+			sys.stdout.write( ' i = {1}, error: {0}'.format(t, counter) )
+			counter += 1
+		sys.stdout.write('training finished'+'\n')
+	def setRandom(self):
+		return np.random.uniform(0, 1)	
 
 	def runGame(self):
 		#startState = self.gamemgr.getStartState()
@@ -36,7 +60,10 @@ class gridWorldLearning(InverseLearning):
 				cx, cy = self.gamemgr.int_to_point(currentState)
 				print('=========================')		
 				print('Current state: ', (cx, cy))
-				p = np.random.uniform(0, 1)
+				if self.random == True:
+					p = np.random.uniform(0, 1)
+				else:
+					p = 1
 				action = self.agent.getAction(currentState)
 				if  p > self.gamemgr.wind:	
 					 # Specific action
@@ -73,6 +100,10 @@ class gridWorldLearning(InverseLearning):
 				#print('=========================')		
 				#print('Current state: ', (cx, cy))
 				# print('P')
+				if self.random == True:
+					p = np.random.uniform(0, 1)
+				else:
+					p = 1
 				p = np.random.uniform(0, 1)
 				action = self.agent.getAction(currentState) 
 				if  p > self.gamemgr.wind:		
@@ -110,30 +141,90 @@ class gridWorldLearning(InverseLearning):
 
 		#print('Negative Score: ', self.gamemgr.getNegativeScore())
 
+def experiment(DaPingTai, random = True, SpecificReward = False, numberOfTrajectories = 25, labelName = 'Normal'):
+	print('Running: '+labelName)
+	size = DaPingTai.n_states
+	w = np.zeros((size, 1))
+	if SpecificReward == True:
+		w = DaPingTai.ground_r
+		w[DaPingTai.getPostiveRewardState()] = 1
+		w = np.reshape(w, (size, 1))
+
+	agent = gridWorldAgent(w, DaPingTai)
+	learn = gridWorldLearning(agent, DaPingTai, random, numberOfTrajectories)
+	if SpecificReward == True:
+		learn.updateAgent()
+	else:
+		learn.computeExpertExpectation()
+
+	learn.train()
+	plt.plot(learn.t, learn.count, alpha = 0.5, label =labelName)
+	learn.test()
+	learn.test()
+	learn.test()
+	learn.test()
+
+def experiment2(DaPingTai, random = True):
+	size = DaPingTai.n_states
+	w = np.zeros((size, 1))
+	agent = gridWorldAgent(w, DaPingTai)
+	learn = gridWorldLearning(agent, DaPingTai, random, numberOfTrajectories = size)
+	learn.computeExpertExpectation()
+	learn.train()
+	plt.plot(learn.t, learn.count, alpha = 0.5, label ='Normal Agent')
+	learn.test()
+	agent = gridWorldQAgent(w, DaPingTai)
+	learn = gridWorldLearning(agent, DaPingTai, random, numberOfTrajectories = size)	
+	learn.computeExpertExpectation()
+	learn.train()
+	learn.test()
+	plt.plot(learn.t, learn.count, alpha = 0.5, label ='Q Agent')
+	plt.xlabel('Iterations')
+	plt.ylabel('Error')
+	plt.legend(loc='best')
+	plt.show()
+
+
+
+
 if __name__ == "__main__":
 	from gridWorldAgent import *
 	sys.path.append('../gridworld/')
 	from GridWorld import *
 	
-	DaPingTai = DaPingTai(4, 0.3, 1)
+	DaPingTai = DaPingTai(5, 0.3, 1)
 	goalstate = DaPingTai.getPostiveRewardState()
-	w = np.zeros((16, 1))
+
 	# w = np.array([0, 0, -1, 1, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0]).reshape(16, 1)
 	#w[goalstate] = 1
-	agent = gridWorldQAgent(w, DaPingTai)
-
-	learn = gridWorldLearning(agent, DaPingTai)
-
-	learn.computeExpertExpectation()
+	# Normal Agent
+	plt.figure()
 	# learn.updateAgent()
-	
-	learn.train()
-	
-	learn.test()
+	experiment(DaPingTai, random = True, SpecificReward = False, numberOfTrajectories = DaPingTai.n_states, labelName = 'Normal')
+	experiment(DaPingTai, random = False, SpecificReward = False, numberOfTrajectories = DaPingTai.n_states, labelName = 'Remove Random')
+	# experiment(DaPingTai, random = True, SpecificReward = True, numberOfTrajectories = DaPingTai.n_states, labelName = 'Spedicfied Reward')
+	experiment(DaPingTai, random = True, SpecificReward = False, numberOfTrajectories = 20, labelName = 'Specified Trajectories')
 
-	learn.test()
-	learn.test()
-	learn.test()
+
+
+
+	
+	# Q Agent
+	# agent = gridWorldQAgent(w, DaPingTai)
+	# learn = gridWorldLearning(agent, DaPingTai, random = True, numberOfTrajectories = DaPingTai.n_states)
+	# learn.computeExpertExpectation()	
+	# learn.train()
+	# plt.plot(learn.t, learn.count, alpha = 0.5, label ='Q Agent')
+
+	plt.xlabel('Iterations')
+	plt.ylabel('Error')
+	plt.legend(loc='best')
+	plt.show()
+
+	experiment2(DaPingTai)
+
+
+
 
 
 

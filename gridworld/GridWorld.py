@@ -30,12 +30,12 @@ class DaPingTai(object):
         self.wind = wind
         self.discount = discount
         # Construct whole map as an n_states x 1 array
-        # self.ground_r = np.array([self.setNegativeReward(s) for s in range(self.n_states)])
-        self.ground_r = np.array([0, 0, -1, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0])
-        # self.positiveState = self.setPostiveRewardState(self.ground_r)
-        self.positiveState = 3
-        # self.startState = self.setStartState(self.ground_r)
-        self.startState = 0
+        self.ground_r = np.array([self.setNegativeReward(s) for s in range(self.n_states)])
+        # self.ground_r = np.array([0, 0, -1, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0])
+        self.positiveState = self.setPostiveRewardState(self.ground_r)
+        # self.positiveState = 3
+        self.startState = self.setStartState(self.ground_r)
+        # self.startState = 0
         self.currentState = self.startState
         self.negativeScore = 0
 
@@ -271,13 +271,15 @@ class DaPingTai(object):
         return [(0, 0)]   # If no way, just stay
 
 
-    def optimalPolicy(self, gamma):
+    def optimalPolicy(self, gamma, numberOfTrajectories):
         matrix_ground_r = self.convertToMatrix(self.ground_r)
 
         phi_sum = 0
 
+        state_range = np.random.permutation(range((self.n_states)))[:numberOfTrajectories]
+
         #print('g', matrix_ground_r)
-        for state in range((self.n_states)):
+        for state in state_range:
 
             #print('State:', state)
             if self.ground_r[state] == -1:

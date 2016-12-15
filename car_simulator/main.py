@@ -41,7 +41,8 @@ def main(argv):
         agent = CarAgent3(w=np.zeros([15,1]))
         learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=10, numRLTraining=10)
         # learn.agent.loadPolicy('policyMiddle.mat')
-        learn.loadPolicy('policy.mat',49)
+        learn.loadPolicy('policyRight.mat',49)
+        # policy_nastyRight.mat, 49
         learn.computeExpertExpectation()
         learn.test()
 

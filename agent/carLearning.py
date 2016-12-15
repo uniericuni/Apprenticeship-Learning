@@ -1,5 +1,6 @@
 from inverseLearning import *
-import game
+from config import *
+import game, time
 import scipy.io as sio
 
 class CarLearning(InverseLearning):
@@ -54,6 +55,7 @@ class CarLearning(InverseLearning):
         feature,state,legal_action = self.gamemgr.update()
         self.agent.registerInitialState((state, legal_action))
         counter = 0
+        features = []
         # print state
         # print legal_action
 
@@ -69,7 +71,19 @@ class CarLearning(InverseLearning):
             feature,state,legal_action = self.gamemgr.update()
             if self.agent.isInTesting():
                 self.gamemgr.render()
+                # feature export
+                if self.gamemgr.record:
+                    features.append(feature)
+                elif len(features)>0:
+                    timestr = time.strftime('%y%m%d%H%M%S')
+                    sio.savemat('%s%s_record.mat'%(CAR_RECORD_PATH,timestr), {'features':features})
+                    features = []
             counter += 1
+
+        # feature export
+        if len(features)>0:
+            timestr = time.strftime('%y%m%d%H%M%S')
+            sio.savemat('%s%s_record.mat'%(CAR_RECORD_PATH,timestr), {'features':features})
 
         # final
         self.agent.final((state,legal_action))

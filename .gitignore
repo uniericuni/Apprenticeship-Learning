@@ -3,5 +3,6 @@
 *.docx
 *.pyc
 *.svg
+*.mov
 
 *.DS_Store

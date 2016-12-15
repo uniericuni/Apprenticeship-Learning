@@ -40,8 +40,11 @@ def main(argv):
             feature,state,legal_action = gamemgr.update()
         agent = CarAgent3(w=np.zeros([15,1]))
         learn = CarLearning( agent, gamemgr, maxIter=MAX_ITERATION, numEstimating=10, numRLTraining=10)
-        # learn.agent.loadPolicy('policyMiddle.mat')
-        learn.loadPolicy('policy.mat',46)
+        # learn.loadPolicy('policyNormal.mat', 47)
+        # learn.loadPolicy('policyBumping.mat',45)
+        # learn.loadPolicy('policyMiddle3.mat',45)
+        # learn.loadPolicy('policyRight.mat',48)
+        learn.loadPolicy('policyNastyRight.mat',45)
         learn.computeExpertExpectation()
         learn.test()
 

@@ -36,7 +36,7 @@ class CarLearning(InverseLearning):
         #     self.muExpert += ( self.gamma ** i ) * m.T
         # print self.muExpert.T
 
-        f = sio.loadmat('../assets/car_records/20161215_Bumping.mat')['features']
+        f = sio.loadmat('../assets/car_records/20161215_Normal.mat')['features']
         print f.shape
         self.muExpert = np.zeros((self.featureSize,1))
         counter = 0

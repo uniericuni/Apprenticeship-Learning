@@ -156,29 +156,30 @@ def experiment(DaPingTai, random = True, SpecificReward = False, numberOfTraject
 		learn.updateAgent()
 	else:
 		learn.computeExpertExpectation()
+		learn.train()
 
-	learn.train()
-	plt.plot(learn.t, learn.count, alpha = 0.5, label =labelName)
+	plt.plot(learn.count, learn.t, alpha = 0.5, linewidth = 2, label =labelName)
 	learn.test()
 	learn.test()
 	learn.test()
 	learn.test()
 
 def experiment2(DaPingTai, random = True):
+	plt.figure()
 	size = DaPingTai.n_states
 	w = np.zeros((size, 1))
 	agent = gridWorldAgent(w, DaPingTai)
 	learn = gridWorldLearning(agent, DaPingTai, random, numberOfTrajectories = size)
 	learn.computeExpertExpectation()
 	learn.train()
-	plt.plot(learn.t, learn.count, alpha = 0.5, label ='Normal Agent')
+	plt.plot(learn.count, learn.t , alpha = 0.5, linewidth = 2, label ='Normal Agent')
 	learn.test()
 	agent = gridWorldQAgent(w, DaPingTai)
 	learn = gridWorldLearning(agent, DaPingTai, random, numberOfTrajectories = size)	
 	learn.computeExpertExpectation()
 	learn.train()
 	learn.test()
-	plt.plot(learn.t, learn.count, alpha = 0.5, label ='Q Agent')
+	plt.plot(learn.count, learn.t, alpha = 0.5, linewidth = 2, linestyle = '--', label ='Q Agent')
 	plt.xlabel('Iterations')
 	plt.ylabel('Error')
 	plt.legend(loc='best')
@@ -200,10 +201,9 @@ if __name__ == "__main__":
 	# Normal Agent
 	plt.figure()
 	# learn.updateAgent()
-	experiment(DaPingTai, random = True, SpecificReward = False, numberOfTrajectories = DaPingTai.n_states, labelName = 'Normal')
-	experiment(DaPingTai, random = False, SpecificReward = False, numberOfTrajectories = DaPingTai.n_states, labelName = 'Remove Random')
-	# experiment(DaPingTai, random = True, SpecificReward = True, numberOfTrajectories = DaPingTai.n_states, labelName = 'Spedicfied Reward')
-	experiment(DaPingTai, random = True, SpecificReward = False, numberOfTrajectories = 20, labelName = 'Specified Trajectories')
+	# experiment(DaPingTai, random = True, SpecificReward = False, numberOfTrajectories = DaPingTai.n_states, labelName = 'Normal')
+	# experiment(DaPingTai, random = False, SpecificReward = False, numberOfTrajectories = DaPingTai.n_states, labelName = 'Remove Random')
+	# experiment(DaPingTai, random = True, SpecificReward = False, numberOfTrajectories = 20, labelName = 'Specified Trajectories')
 
 
 
@@ -221,7 +221,10 @@ if __name__ == "__main__":
 	plt.legend(loc='best')
 	plt.show()
 
-	experiment2(DaPingTai)
+	# experiment2(DaPingTai)
+	plt.figure()
+	experiment(DaPingTai, random = True, SpecificReward = True, numberOfTrajectories = DaPingTai.n_states, labelName = 'Spedicfied Reward')
+
 
 
 

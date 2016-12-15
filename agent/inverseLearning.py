@@ -17,7 +17,6 @@ class InverseLearning:
         self.w = np.zeros((self.featureSize,1))
         self.mus = np.zeros((featureSize,0))
         self.policies = []
-
         self.muBar = None
     
 

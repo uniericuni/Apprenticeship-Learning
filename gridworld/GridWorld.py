@@ -41,17 +41,6 @@ class DaPingTai(object):
 
 
 
-        # Preconstruct the transition probability array.
-        """
-        self.transition_probability = np.array(
-            [[[self._transition_probability(i, j, k)
-               for k in range(self.n_states)]
-              for j in range(self.n_actions)]
-             for i in range(self.n_states)])
-        """
-
-
-
     def feature_vector(self, i, feature_map="ident"):
         """
         Get the feature vector associated with a state integer.
@@ -66,19 +55,6 @@ class DaPingTai(object):
         f[i] = 1
         return f
 
-    def feature_matrix(self, feature_map="ident"):
-        """
-        Get the feature matrix for this gridworld.
-        feature_map: Which feature map to use (default ident). String in {ident,
-            coord, proxi}.
-        -> NumPy array with shape (n_states, d_states).
-        """
-
-        features = []
-        for n in range(self.n_states):
-            f = self.feature_vector(n, feature_map)
-            features.append(f)
-        return np.array(features)
 
     def int_to_point(self, i):
         """
@@ -98,16 +74,6 @@ class DaPingTai(object):
 
         return p[0]*self.grid_size + p[1]
 
-    def neighbouring(self, i, k):
-        """
-        Get whether two points neighbour each other. Also returns true if they
-        are the same point.
-        i: (x, y) int tuple.
-        k: (x, y) int tuple.
-        -> bool.
-        """
-
-        return abs(i[0] - k[0]) + abs(i[1] - k[1]) <= 1
 
     def getLegalAction(self, state):
         # print('L State', state)

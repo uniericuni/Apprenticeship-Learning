@@ -6,6 +6,19 @@
 - gridworld: gridworld related files
 - assets: utility images, expert trajectories and others
 
+## Grid World
+
+### Command line
+- python2 gridWorldLearning.py
+
+### Evaluation
+- Normal
+- Remove random
+- Specific reward
+- Specific expert trajectories
+
+
+
 ## Car Simulation
 
 ### Command line interface
@@ -18,6 +31,9 @@
 - A/S/D/F/G: switch lane
 - R: record trajectory
 - ESC: quit game
+
+
+
 
 ## References
 - [1] Abbeel, Pieter, and Andrew Y. Ng. "Apprenticeship learning via inverse reinforcement learning." Proceedings of the twenty-first international conference on Machine learning. ACM, 2004.

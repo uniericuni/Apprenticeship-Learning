@@ -165,7 +165,7 @@ def experiment(DaPingTai, random = True, SpecificReward = False, numberOfTraject
 	learn.test()
 
 def experiment2(DaPingTai, random = True):
-	plt.figure()
+	# plt.figure()
 	size = DaPingTai.n_states
 	w = np.zeros((size, 1))
 	agent = gridWorldAgent(w, DaPingTai)
@@ -199,11 +199,12 @@ if __name__ == "__main__":
 	# w = np.array([0, 0, -1, 1, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0]).reshape(16, 1)
 	#w[goalstate] = 1
 	# Normal Agent
-	plt.figure()
+	plt.figure(figsize = (12,6))
+	plt.subplot(121)
 	# learn.updateAgent()
-	# experiment(DaPingTai, random = True, SpecificReward = False, numberOfTrajectories = DaPingTai.n_states, labelName = 'Normal')
-	# experiment(DaPingTai, random = False, SpecificReward = False, numberOfTrajectories = DaPingTai.n_states, labelName = 'Remove Random')
-	# experiment(DaPingTai, random = True, SpecificReward = False, numberOfTrajectories = 20, labelName = 'Specified Trajectories')
+	experiment(DaPingTai, random = True, SpecificReward = False, numberOfTrajectories = DaPingTai.n_states, labelName = 'Normal')
+	experiment(DaPingTai, random = False, SpecificReward = False, numberOfTrajectories = DaPingTai.n_states, labelName = 'Remove Random')
+	experiment(DaPingTai, random = True, SpecificReward = False, numberOfTrajectories = 20, labelName = 'Specified Trajectories')
 
 
 
@@ -219,11 +220,10 @@ if __name__ == "__main__":
 	plt.xlabel('Iterations')
 	plt.ylabel('Error')
 	plt.legend(loc='best')
-	plt.show()
-
-	# experiment2(DaPingTai)
-	plt.figure()
-	experiment(DaPingTai, random = True, SpecificReward = True, numberOfTrajectories = DaPingTai.n_states, labelName = 'Spedicfied Reward')
+	# plt.show()
+	plt.subplot(122)
+	experiment2(DaPingTai)
+	# experiment(DaPingTai, random = True, SpecificReward = True, numberOfTrajectories = DaPingTai.n_states, labelName = 'Spedicfied Reward')
 
 
 
